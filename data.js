@@ -4,11 +4,12 @@ window.BRUJULA_DATA = {
   "titulo": "Brújula 29N",
   "eleccion": "Elecciones generales del 29 de noviembre de 2026",
   "autoria": "Asier Vázquez Jiménez",
-  "quienes_somos": "Brújula 29N es un proyecto personal e independiente de Asier Vázquez Jiménez. No recibe financiación de ningún partido, empresa u organización y no tiene publicidad.",
+  "quienes_somos": "Brújula 29N es un proyecto personal e independiente de Asier Vázquez Jiménez.",
   "contacto": "asiervazquezjimenez@gmail.com",
+  "linkedin": "https://www.linkedin.com/in/asier-vazquez",
   "repositorio": "",
   "min_respuestas": 18,
-  "nota_partidos": "Se incluyen las candidaturas que se presentaron en toda España y superaron el 3 % de los votos en las elecciones generales de 2023: PP, PSOE, Vox y Sumar. Las propuestas proceden de los programas que presentaron a esas elecciones."
+  "nota_partidos": "Se incluyen las candidaturas que concurrieron en todo el territorio nacional y superaron el 3 % de los votos válidos en las elecciones generales de 2023: PP, PSOE, Vox y Sumar. Las propuestas proceden de los programas electorales que presentaron a dichas elecciones."
  },
  "partidos": [
   {
@@ -76,7 +77,7 @@ window.BRUJULA_DATA = {
    "id": "P02",
    "tema": "Sanidad",
    "texto": "[…] revisaremos la Ley de Eutanasia tomando en consideración la opinión del Comité de Bioética.",
-   "aclaracion": "La Ley de Eutanasia, en vigor desde 2021, regula el derecho a solicitar ayuda para morir en determinados supuestos.",
+   "aclaracion": "La Ley Orgánica de regulación de la eutanasia, en vigor desde 2021, reconoce el derecho a solicitar la ayuda para morir en determinados supuestos.",
    "autor": "PP",
    "apartado": "Medida 138",
    "pagina": 48,
@@ -107,7 +108,7 @@ window.BRUJULA_DATA = {
    "id": "P03",
    "tema": "Justicia",
    "texto": "Reforzaremos las garantías de independencia del Poder Judicial, mediante la reforma de su ley Orgánica, incluyendo la modificación del sistema de elección de los miembros del Consejo de manera que sean los jueces y magistrados los que elijan a los 12 vocales de procedencia judicial.",
-   "aclaracion": "El Consejo General del Poder Judicial (CGPJ) es el órgano de gobierno de los jueces. Hoy sus 20 vocales los eligen el Congreso y el Senado por mayoría de tres quintos; 12 de ellos, entre candidatos propuestos por jueces y magistrados.",
+   "aclaracion": "El Consejo General del Poder Judicial (CGPJ) es el órgano de gobierno de jueces y magistrados. En 2023, sus 20 vocales eran elegidos por el Congreso y el Senado por mayoría de tres quintos; 12 de ellos, entre candidatos procedentes de la carrera judicial.",
    "autor": "PP",
    "apartado": "Medida 237",
    "pagina": 75,
@@ -138,7 +139,7 @@ window.BRUJULA_DATA = {
    "id": "P04",
    "tema": "Vivienda",
    "texto": "Derogaremos la ley de vivienda, que ha generado inseguridad jurídica y no resuelve ninguno de los problemas de fondo del mercado de la vivienda.",
-   "aclaracion": "La Ley por el Derecho a la Vivienda de 2023 permite, entre otras cosas, limitar el precio del alquiler en zonas declaradas tensionadas.",
+   "aclaracion": "La Ley 12/2023, por el derecho a la vivienda, permite, entre otras medidas, limitar el precio del alquiler en las zonas declaradas de mercado tensionado.",
    "autor": "PP",
    "apartado": "Medida 90",
    "pagina": 34,
@@ -169,7 +170,7 @@ window.BRUJULA_DATA = {
    "id": "P05",
    "tema": "Derechos",
    "texto": "Introduciremos en la legislación en materia de interrupción voluntaria del embarazo el consentimiento de los titulares de la patria potestad previo a la realización del aborto en las jóvenes menores de edad.",
-   "aclaracion": "Desde 2023, las chicas de 16 y 17 años pueden abortar sin el consentimiento de sus padres o tutores.",
+   "aclaracion": "Desde la reforma legal de 2023, las mujeres de 16 y 17 años pueden interrumpir voluntariamente el embarazo sin el consentimiento de sus progenitores o tutores.",
    "autor": "PP",
    "apartado": "Medida 129",
    "pagina": 47,
@@ -231,7 +232,7 @@ window.BRUJULA_DATA = {
    "id": "P07",
    "tema": "Impuestos",
    "texto": "Eliminaremos el impuesto a las grandes fortunas […]",
-   "aclaracion": "Impuesto estatal creado en 2022 sobre los patrimonios netos superiores a 3 millones de euros.",
+   "aclaracion": "Se refiere al Impuesto Temporal de Solidaridad de las Grandes Fortunas, creado en 2022, que grava los patrimonios netos superiores a 3 millones de euros.",
    "autor": "PP",
    "apartado": "Medida 42",
    "pagina": 23,
@@ -262,7 +263,7 @@ window.BRUJULA_DATA = {
    "id": "P08",
    "tema": "Economía",
    "texto": "Evaluaremos la prórroga y ajustes de los gravámenes temporales sobre la banca y energéticas, para que ambos sectores sigan contribuyendo a la justicia fiscal y al sostenimiento del Estado de bienestar.",
-   "aclaracion": "Gravámenes temporales: impuestos extraordinarios aprobados en 2022 sobre los ingresos de los grandes bancos y las grandes empresas energéticas.",
+   "aclaracion": "Gravámenes temporales: impuestos extraordinarios aprobados en 2022 sobre las grandes entidades financieras y las grandes empresas energéticas.",
    "autor": "PSOE",
    "apartado": "Bloque I",
    "pagina": 39,
@@ -293,7 +294,7 @@ window.BRUJULA_DATA = {
    "id": "P09",
    "tema": "Justicia",
    "texto": "[…] seguiremos exigiendo la inmediata renovación del Consejo General del Poder Judicial con el sistema actual de doble legitimación en su elección […]",
-   "aclaracion": "Sistema actual: el Congreso y el Senado eligen por mayoría de tres quintos a los 20 vocales del Consejo; 12 de ellos, entre candidatos propuestos por jueces y magistrados.",
+   "aclaracion": "El «sistema actual de doble legitimación» es el vigente en 2023: el Congreso y el Senado eligen por mayoría de tres quintos a los 20 vocales del Consejo General del Poder Judicial (órgano de gobierno de jueces y magistrados); 12 de ellos, entre candidatos procedentes de la carrera judicial. La propuesta defiende mantener ese sistema.",
    "autor": "PSOE",
    "apartado": "Bloque VI",
    "pagina": 248,
@@ -324,7 +325,7 @@ window.BRUJULA_DATA = {
    "id": "P10",
    "tema": "Igualdad",
    "texto": "Renovar el pacto de estado contra la violencia de género.",
-   "aclaracion": "El Pacto de Estado contra la Violencia de Género, de 2017, es un conjunto de medidas y fondos acordados en el Congreso para combatir la violencia contra las mujeres.",
+   "aclaracion": "El Pacto de Estado contra la Violencia de Género, aprobado en 2017, es un conjunto de medidas y de financiación acordado en el Congreso para combatir la violencia contra las mujeres.",
    "autor": "PSOE",
    "apartado": "Bloque IV",
    "pagina": 152,
@@ -355,7 +356,7 @@ window.BRUJULA_DATA = {
    "id": "P11",
    "tema": "Memoria",
    "texto": "Culminaremos la resignificación del Valle de Cuelgamuros como Lugar de Memoria Democrática y procederemos a la creación de un centro de interpretación.",
-   "aclaracion": "Cuelgamuros es el nombre oficial del antiguo Valle de los Caídos.",
+   "aclaracion": "Cuelgamuros es la denominación oficial del antiguo Valle de los Caídos.",
    "autor": "PSOE",
    "apartado": "Bloque VI, Memoria democrática",
    "pagina": 253,
@@ -479,7 +480,7 @@ window.BRUJULA_DATA = {
    "id": "P15",
    "tema": "Empleo",
    "texto": "En 2024 se establecerá por ley una jornada laboral máxima de 37,5 horas y se abrirá un proceso de diálogo social para seguir reduciendo la jornada hasta alcanzar las 32 horas semanales.",
-   "aclaracion": "Hoy la jornada máxima legal es de 40 horas semanales.",
+   "aclaracion": "En 2023, la jornada máxima legal era de 40 horas semanales.",
    "autor": "SUMAR",
    "apartado": "Más empleo, con mejores condiciones de trabajo",
    "pagina": 24,
@@ -541,7 +542,7 @@ window.BRUJULA_DATA = {
    "id": "P17",
    "tema": "Inmigración",
    "texto": "Reforma de la Ley Orgánica sobre Derechos y Libertades de los Extranjeros en España y su Integración Social (LOEX) que prime los criterios de reconocimiento de derechos y que introduzca un procedimiento de regularización permanente.",
-   "aclaracion": "Regularización: procedimiento por el que una persona extranjera en situación irregular obtiene un permiso de residencia.",
+   "aclaracion": "Regularización: procedimiento por el que una persona extranjera en situación administrativa irregular obtiene una autorización de residencia.",
    "autor": "SUMAR",
    "apartado": "Migraciones, 4",
    "pagina": 104,
@@ -572,7 +573,7 @@ window.BRUJULA_DATA = {
    "id": "P18",
    "tema": "Vivienda",
    "texto": "Aplicaremos […] la regulación de alquileres a todas las zonas de mercado tensionado para garantizar la igualdad de todos los inquilinos en el ejercicio de sus derechos.",
-   "aclaracion": "Zona tensionada: área donde el alquiler es especialmente caro respecto a los ingresos de los hogares; allí la ley permite limitar su precio.",
+   "aclaracion": "Zona de mercado tensionado: área en la que el coste de la vivienda es especialmente elevado en relación con los ingresos de los hogares; la Ley 12/2023 permite limitar en ella el precio del alquiler.",
    "autor": "SUMAR",
    "apartado": "Vivienda",
    "pagina": 77,
@@ -603,7 +604,7 @@ window.BRUJULA_DATA = {
    "id": "P19",
    "tema": "Empleo",
    "texto": "Subiremos el salario mínimo interprofesional por encima del IPC anual para mantener la ganancia de poder adquisitivo de las personas que lo cobran.",
-   "aclaracion": "IPC: índice de precios de consumo, la medida oficial de la inflación.",
+   "aclaracion": "IPC: índice de precios de consumo, indicador oficial de la inflación.",
    "autor": "SUMAR",
    "apartado": "Economía para una vida mejor, 5",
    "pagina": 7,
@@ -663,32 +664,32 @@ window.BRUJULA_DATA = {
   },
   {
    "id": "P21",
-   "tema": "Igualdad",
-   "texto": "Es imprescindible fortalecer el Ministerio de Igualdad para continuar con la labor emprendida hasta la fecha […]",
-   "aclaracion": "",
+   "tema": "Energía",
+   "texto": "[Este partido] se compromete a mantener el calendario de cierre del parque nuclear español, aplicando una moratoria a cualquier nueva iniciativa nuclear […]",
+   "aclaracion": "En 2023, el calendario vigente preveía el cierre escalonado de las centrales nucleares españolas entre 2027 y 2035.",
    "autor": "SUMAR",
-   "apartado": "Igualdad, 14. Fortalecimiento institucional",
-   "pagina": 112,
+   "apartado": "9. Hacia un cierre nuclear seguro y socialmente justo",
+   "pagina": 48,
    "posturas": {
     "PP": {
-     "v": null,
-     "cita": "",
-     "pagina": null
+     "v": -2,
+     "cita": "Propondremos, con el visto bueno del Consejo de Seguridad Nuclear, la extensión de la vida útil de las centrales nucleares existentes",
+     "pagina": 38
     },
     "PSOE": {
-     "v": null,
-     "cita": "",
-     "pagina": null
+     "v": 1,
+     "cita": "necesidades en el desmantelamiento ordenado y progresivo de las centrales nucleares",
+     "pagina": 75
     },
     "VOX": {
      "v": -2,
-     "cita": "Suprimiremos el Ministerio de Igualdad",
-     "pagina": 11
+     "cita": "promoveremos la extensión de la vida útil de las centrales nucleares existentes",
+     "pagina": 117
     },
     "SUMAR": {
      "v": 2,
-     "cita": "Es imprescindible fortalecer el Ministerio de Igualdad para continuar con la labor emprendida hasta la fecha […]",
-     "pagina": 112
+     "cita": "[Este partido] se compromete a mantener el calendario de cierre del parque nuclear español, aplicando una moratoria a cualquier nueva iniciativa nuclear […]",
+     "pagina": 48
     }
    }
   },
@@ -696,7 +697,7 @@ window.BRUJULA_DATA = {
    "id": "P22",
    "tema": "Impuestos",
    "texto": "Suprimiremos el Impuesto sobre el Patrimonio, el Impuesto sobre Sucesiones y Donaciones y Plusvalías municipales en todo el territorio nacional […]",
-   "aclaracion": "Plusvalía municipal: impuesto que cobran los ayuntamientos cuando se vende o hereda un inmueble urbano.",
+   "aclaracion": "Plusvalía municipal: impuesto municipal sobre el incremento de valor de los terrenos urbanos, que se aplica al vender, donar o heredar un inmueble.",
    "autor": "VOX",
    "apartado": "Medida 151",
    "pagina": 77,
@@ -727,7 +728,7 @@ window.BRUJULA_DATA = {
    "id": "P23",
    "tema": "Modelo territorial",
    "texto": "[…] proponemos la devolución inmediata al Estado de las competencias en Educación, Sanidad, Seguridad y Justicia.",
-   "aclaracion": "Hoy las comunidades autónomas gestionan la educación y la sanidad; algunas tienen policía propia y gestionan los medios materiales de la justicia.",
+   "aclaracion": "En 2023, las comunidades autónomas gestionaban la educación y la sanidad; algunas contaban con policía propia y gestionaban los medios materiales de la administración de justicia.",
    "autor": "VOX",
    "apartado": "Medida 2",
    "pagina": 8,
@@ -758,7 +759,7 @@ window.BRUJULA_DATA = {
    "id": "P24",
    "tema": "Inmigración",
    "texto": "Supresión de la institución del arraigo como forma de regular la inmigración ilegal y revocación de las pasarelas rápidas para adquirir la nacionalidad española.",
-   "aclaracion": "Arraigo: vía legal por la que una persona extranjera en situación irregular puede obtener residencia si acredita años en España y vínculos laborales, familiares o sociales.",
+   "aclaracion": "Arraigo: vía legal por la que una persona extranjera en situación irregular puede obtener una autorización de residencia si acredita un tiempo de permanencia en España y vínculos laborales, familiares o sociales.",
    "autor": "VOX",
    "apartado": "Medida 218",
    "pagina": 103,
@@ -789,7 +790,7 @@ window.BRUJULA_DATA = {
    "id": "P25",
    "tema": "Igualdad",
    "texto": "Derogaremos la Ley de violencia de género y de toda norma que derive de la teoría de género, que atente contra la presunción de inocencia o establezca tribunales de excepción según el sexo del agresor o la víctima.",
-   "aclaracion": "La Ley Integral contra la Violencia de Género (2004) protege a las mujeres frente a la violencia de sus parejas o exparejas y creó juzgados especializados.",
+   "aclaracion": "La Ley Orgánica de Medidas de Protección Integral contra la Violencia de Género (2004) protege a las mujeres frente a la violencia ejercida por sus parejas o exparejas y creó los juzgados de violencia sobre la mujer.",
    "autor": "VOX",
    "apartado": "Medida 278",
    "pagina": 128,
@@ -849,12 +850,12 @@ window.BRUJULA_DATA = {
   },
   {
    "id": "P27",
-   "tema": "Igualdad",
-   "texto": "Suprimiremos el Ministerio de Igualdad […]",
-   "aclaracion": "",
+   "tema": "Sanidad",
+   "texto": "Incluiremos en la cartera de servicios las prestaciones relacionadas con la salud bucodental y oftalmológica.",
+   "aclaracion": "Cartera de servicios: conjunto de prestaciones que cubre la sanidad pública. Salud bucodental: dientes y boca. Salud oftalmológica: vista.",
    "autor": "VOX",
-   "apartado": "Medida 15",
-   "pagina": 11,
+   "apartado": "Medida 114",
+   "pagina": 58,
    "posturas": {
     "PP": {
      "v": null,
@@ -862,19 +863,19 @@ window.BRUJULA_DATA = {
      "pagina": null
     },
     "PSOE": {
-     "v": null,
-     "cita": "",
-     "pagina": null
+     "v": 1,
+     "cita": "mediante el acceso a servicios de atención a la salud bucodental y la salud mental, a gafas y audífonos",
+     "pagina": 183
     },
     "VOX": {
      "v": 2,
-     "cita": "Suprimiremos el Ministerio de Igualdad […]",
-     "pagina": 11
+     "cita": "Incluiremos en la cartera de servicios las prestaciones relacionadas con la salud bucodental y oftalmológica.",
+     "pagina": 58
     },
     "SUMAR": {
-     "v": -2,
-     "cita": "Es imprescindible fortalecer el Ministerio de Igualdad",
-     "pagina": 112
+     "v": 2,
+     "cita": "Proponemos incorporar a los servicios sanitarios públicos nuevas prestaciones, como la salud bucodental",
+     "pagina": 89
     }
    }
   },
@@ -882,7 +883,7 @@ window.BRUJULA_DATA = {
    "id": "P28",
    "tema": "Justicia",
    "texto": "Reintroduciremos los delitos de referéndum ilegal, sedición, traición y malversación de caudales públicos […]",
-   "aclaracion": "En 2022 se suprimió el delito de sedición y se rebajaron algunas penas de malversación.",
+   "aclaracion": "En 2022 se suprimió el delito de sedición y se modificaron las penas del delito de malversación.",
    "autor": "VOX",
    "apartado": "Medida 18",
    "pagina": 16,
@@ -917,7 +918,7 @@ window.BRUJULA_DATA = {
    "titulo": "The design effects of voting advice applications: Comparing methods of calculating matches",
    "publicacion": "Acta Politica, 49(3), 286–312",
    "url": "https://doi.org/10.1057/ap.2013.30",
-   "uso": "Cómo influye la fórmula de cálculo en el resultado; base de la prueba «otra fórmula»."
+   "uso": "Efecto del método de cálculo sobre el resultado. Fundamenta el control de robustez del método."
   },
   {
    "autores": "Walgrave, S., Nuytemans, M. y Pepermans, K.",
@@ -925,7 +926,7 @@ window.BRUJULA_DATA = {
    "titulo": "Voting aid applications and the effect of statement selection",
    "publicacion": "West European Politics, 32(6), 1161–1180",
    "url": "https://doi.org/10.1080/01402380903230637",
-   "uso": "Por qué la selección de propuestas debe seguir reglas fijas y equilibradas."
+   "uso": "Influencia de la selección de propuestas en el resultado. Fundamenta los criterios de selección."
   },
   {
    "autores": "Gemenis, K.",
@@ -933,7 +934,7 @@ window.BRUJULA_DATA = {
    "titulo": "Estimating parties' policy positions through voting advice applications: Some methodological considerations",
    "publicacion": "Acta Politica, 48(3), 268–295",
    "url": "https://doi.org/10.1057/ap.2012.36",
-   "uso": "Cómo asignar la postura de cada partido a partir de documentos."
+   "uso": "Asignación de posturas a los partidos a partir de sus documentos programáticos."
   },
   {
    "autores": "Efron, B. y Tibshirani, R. J.",
@@ -941,7 +942,7 @@ window.BRUJULA_DATA = {
    "titulo": "An Introduction to the Bootstrap",
    "publicacion": "Chapman & Hall/CRC",
    "url": "",
-   "uso": "Técnica bootstrap para detectar empates técnicos."
+   "uso": "Remuestreo bootstrap, utilizado para detectar los empates técnicos."
   },
   {
    "autores": "Cohen, J.",
@@ -949,7 +950,7 @@ window.BRUJULA_DATA = {
    "titulo": "A coefficient of agreement for nominal scales",
    "publicacion": "Educational and Psychological Measurement, 20(1), 37–46",
    "url": "https://doi.org/10.1177/001316446002000104",
-   "uso": "Idea de corregir el acuerdo por el que se daría por azar."
+   "uso": "Corrección del grado de acuerdo por el acuerdo esperable al azar."
   },
   {
    "autores": "Parlamento Europeo y Consejo de la UE",
@@ -957,25 +958,25 @@ window.BRUJULA_DATA = {
    "titulo": "Reglamento (UE) 2016/679, General de Protección de Datos, artículo 9",
    "publicacion": "Diario Oficial de la Unión Europea, L 119",
    "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-   "uso": "Las opiniones políticas son datos especialmente protegidos: por eso la web no guarda respuestas."
+   "uso": "Las opiniones políticas como categoría especial de datos personales."
   }
  ],
  "validacion": {
-  "fecha": "2026-11-02 18:00 UTC",
+  "fecha": "2026-11-02 18:48 UTC",
   "semilla": 29,
   "pruebas": [
    {
-    "prueba": "Votante perfecto",
-    "que": "Un usuario que responde exactamente lo que dice cada partido.",
-    "criterio": "Le sale su partido primero, siempre.",
-    "resultado": "Correcto en todos los partidos.",
+    "prueba": "Coincidencia perfecta",
+    "que": "Respuestas idénticas a las posturas de cada partido.",
+    "criterio": "El partido correspondiente obtiene el primer puesto en todos los casos.",
+    "resultado": "Se cumple para todos los partidos.",
     "ok": true
    },
    {
     "prueba": "Votante realista",
-    "que": "5.000 usuarios por partido que parten de sus posturas, con un 40 % de respuestas desviadas un punto y un 10 % de «no lo sé».",
-    "criterio": "Al menos al 80 % le sale su partido.",
-    "resultado": "Aciertos: PP 99 %, PSOE 95 %, Vox 100 %, Sumar 99 %. El más bajo: PSOE.",
+    "que": "5.000 usuarios por partido que parten de sus posturas, con un 40 % de respuestas desviadas un nivel y un 10 % de «no lo sé».",
+    "criterio": "Al menos el 80 % obtiene como resultado el partido del que parte.",
+    "resultado": "Porcentaje de acierto: PP 99 %, PSOE 96 %, Vox 100 %, Sumar 98 %.",
     "ok": true,
     "confusion": [
      [
@@ -986,51 +987,51 @@ window.BRUJULA_DATA = {
      ],
      [
       0.0,
-      0.9546,
+      0.9644,
       0.0,
-      0.0454
+      0.0356
      ],
      [
-      0.002,
+      0.0024,
       0.0,
-      0.998,
+      0.9976,
       0.0
      ],
      [
       0.0,
-      0.0134,
+      0.0176,
       0.0,
-      0.9866
+      0.9824
      ]
     ]
    },
    {
-    "prueba": "Votante al azar",
+    "prueba": "Respuestas aleatorias",
     "que": "100.000 usuarios que responden al azar.",
-    "criterio": "Cada partido gana entre el 12 % y el 38 % de las veces (lo justo sería el 25 %).",
-    "resultado": "Reparto: PP 24,5 %, PSOE 23,1 %, Vox 26,7 %, Sumar 25,8 %.",
+    "criterio": "Cada partido obtiene el primer puesto entre el 12 % y el 38 % de las veces (el reparto equitativo sería el 25 %).",
+    "resultado": "Frecuencia del primer puesto: PP 25,1 %, PSOE 22,6 %, Vox 26,3 %, Sumar 26,0 %.",
     "ok": true
    },
    {
-    "prueba": "Todo sí / todo no",
-    "que": "Usuarios que marcan la misma respuesta en todas las preguntas.",
-    "criterio": "El primero y el segundo están a menos de 5 puntos.",
-    "resultado": "todo «muy a favor»: Vox saca 1,4 puntos al segundo; todo «muy en contra»: Sumar saca 4,7 puntos al segundo; todo «neutral»: PP saca 1,3 puntos al segundo.",
+    "prueba": "Respuesta uniforme",
+    "que": "Usuarios que eligen la misma respuesta en todas las propuestas.",
+    "criterio": "La diferencia entre el primer y el segundo partido es inferior a 5 puntos.",
+    "resultado": "siempre «muy a favor»: diferencia de 2,2 puntos; siempre «muy en contra»: diferencia de 1,0 puntos; siempre «neutral»: diferencia de 0,3 puntos.",
     "ok": true
    },
    {
-    "prueba": "Pregunta decisiva",
-    "que": "Se quita cada pregunta, de una en una, y se repite el votante perfecto.",
-    "criterio": "Ninguna pregunta suelta cambia el resultado.",
-    "resultado": "Ninguna pregunta es decisiva por sí sola.",
+    "prueba": "Influencia de una sola propuesta",
+    "que": "Se elimina cada propuesta, de una en una, y se repite la prueba de coincidencia perfecta.",
+    "criterio": "Ninguna propuesta altera por sí sola el resultado.",
+    "resultado": "Ninguna propuesta altera por sí sola el resultado.",
     "ok": true,
     "criticas": []
    },
    {
-    "prueba": "Otra fórmula",
-    "que": "Se recalcula con distancia euclídea en lugar de Manhattan, sobre 10.000 votantes realistas.",
-    "criterio": "Mismo ganador en al menos el 95 % de los casos.",
-    "resultado": "Mismo ganador en el 98,6 % de los casos.",
+    "prueba": "Robustez del método",
+    "que": "Se repite el cálculo con distancia euclídea en lugar de distancia de Manhattan, sobre 10.000 votantes realistas.",
+    "criterio": "El partido con mayor coincidencia es el mismo en al menos el 95 % de los casos.",
+    "resultado": "Coincide en el 98,7 % de los casos.",
     "ok": true
    }
   ]

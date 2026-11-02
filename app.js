@@ -17,6 +17,8 @@
   var N = D.propuestas.length;
   var POR_PARTIDO = Math.round(N / D.partidos.length);
   var MINUTOS = Math.max(5, Math.round(N * 0.25));
+  var REPETICIONES = D.parametros.bootstrap.toLocaleString("es-ES");
+  var UMBRAL = Math.round(D.parametros.umbral_empate * 100);
 
   var estado = nuevoEstado();
   function nuevoEstado() {
@@ -29,21 +31,21 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function pct(x) { return Math.round(x) + " %"; }
+  function pct(x) { return Math.round(x) + "\u00a0%"; }
   function etiqueta(v) {
     for (var i = 0; i < ESCALA.length; i++) if (ESCALA[i].v === v) return ESCALA[i].t;
     return "";
   }
   function nombre(id) { return PARTIDO[id] ? PARTIDO[id].nombre : id; }
-  function enlacePagina(id, pagina) {
-    var p = PARTIDO[id];
-    if (!p || !p.url) return "";
-    return p.url + (pagina ? "#page=" + pagina : "");
+  function externo(url, texto) {
+    // noreferrer: algunos servidores rechazan los enlaces que llegan desde otra web
+    return '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + texto + "</a>";
   }
   function refHTML(id, pagina, apartado) {
     var p = PARTIDO[id];
+    if (!p) return "";
     var txt = esc(p.programa) + (apartado ? ", " + esc(apartado) : "") + (pagina ? ", p. " + pagina : "");
-    return '<a href="' + esc(enlacePagina(id, pagina)) + '" target="_blank" rel="noopener">' + txt + "</a>";
+    return externo(p.url + (pagina ? "#page=" + pagina : ""), txt);
   }
   var CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -80,19 +82,15 @@
     else { pintarInicio(); if (ruta === "/como-funciona") seccion = "como-funciona"; }
 
     document.querySelectorAll("[data-nav]").forEach(function (a) {
-      var activo = a.getAttribute("data-nav") === ruta.replace("/", "");
-      if (activo) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+      if (a.getAttribute("data-nav") === ruta.replace("/", "")) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
     });
     var navTest = document.getElementById("nav-test");
-    navTest.textContent = ruta !== "/test" && testEmpezado() && estado.idx < estado.orden.length ? "Seguir el test" : "Hacer el test";
+    navTest.textContent = ruta !== "/test" && testEmpezado() && estado.idx < estado.orden.length ? "Continuar el test" : "Hacer el test";
     navTest.style.visibility = ruta === "/test" ? "hidden" : "visible";
 
-    if (seccion) {
-      var el = document.getElementById(seccion);
-      if (el) el.scrollIntoView();
-    } else {
-      window.scrollTo(0, 0);
-    }
+    if (seccion) { var el = document.getElementById(seccion); if (el) el.scrollIntoView(); }
+    else window.scrollTo(0, 0);
   }
 
   // ---------- portada ----------
@@ -119,59 +117,63 @@
 
   function pintarInicio() {
     var c = D.config;
+    var empezar = testEmpezado() ? "Continuar el test" : "Empezar el test";
     var faq = [
-      ["¿Me dice a quién tengo que votar?",
-        "No. Te muestra con qué propuestas coincides y de qué partido son, para que decidas con información de primera mano. El voto es tuyo."],
-      ["¿Cómo sé que no está sesgado?",
-        "Por tres motivos que puedes comprobar: las propuestas son literales y enlazan a su página del programa; todos los partidos tienen el mismo número de propuestas (" + POR_PARTIDO + "); y antes de publicar, el cálculo supera seis pruebas con miles de usuarios simulados. Todo está explicado en la <a href=\"#/metodologia\">metodología</a>."],
-      ["¿Por qué aparecen estos partidos?", esc(c.nota_partidos)],
-      ["¿Qué pasa si marco «Esto me importa mucho»?",
-        "Esa propuesta cuenta el doble al calcular tu resultado. Úsalo en los temas que más pesan en tu voto: así el resultado refleja mejor tus prioridades. Si no lo marcas en ninguna, todas cuentan igual."],
+      ["¿Recomienda a qué partido votar?",
+        "No. Indica el grado de coincidencia entre tus respuestas y las propuestas de cada partido. La decisión de voto corresponde exclusivamente a cada persona."],
+      ["¿Cómo se garantiza la neutralidad?",
+        "Mediante tres mecanismos verificables: las propuestas son literales y enlazan a su página del programa; todos los partidos aportan el mismo número de propuestas (" + POR_PARTIDO + "); y el cálculo supera seis controles de calidad antes de cada publicación. El detalle figura en la <a href=\"#/metodologia\">metodología</a>."],
+      ["¿Por qué se incluyen estos partidos?", esc(c.nota_partidos)],
+      ["¿Qué efecto tiene marcar una propuesta como importante?",
+        "La propuesta recibe doble peso en el cálculo del resultado. Así, la coincidencia en los asuntos que cada persona considera prioritarios influye más que la coincidencia en el resto. Si no se marca ninguna, todas las propuestas pesan lo mismo."],
       ["¿Qué significa «empate técnico»?",
-        "Que la diferencia entre los dos primeros es tan pequeña que depende de una o dos respuestas. En lugar de darte un ganador poco fiable, te lo decimos claramente."],
-      ["¿Y si un partido no dice nada sobre una propuesta?",
-        "Entonces no se le compara en esa pregunta. No le ponemos una postura que su programa no recoge. El cálculo tiene en cuenta en cuántas propuestas se ha podido comparar a cada partido."],
-      ["¿Qué hacéis con mis respuestas?",
-        "Nada: no salen de tu dispositivo. No hay registro, base de datos, cookies ni estadísticas. Al cerrar la página, desaparecen."],
-      ["¿Puedo revisar los datos?",
-        "Sí. En los resultados verás, para cada propuesta, la cita del programa en la que se basa la postura de cada partido. En <a href=\"#/fuentes\">Fuentes</a> puedes descargar la tabla completa."]
+        "Que la diferencia entre los dos primeros partidos es demasiado pequeña para considerarse concluyente, porque depende de una o dos respuestas. En ese caso, en lugar de señalar un único partido, el resultado indica el empate."],
+      ["¿Qué ocurre si un partido no se pronuncia sobre una propuesta?",
+        "No se le atribuye ninguna postura y esa propuesta no interviene en su cálculo. El resultado indica en cuántas propuestas se ha podido comparar a cada partido."],
+      ["¿Qué se hace con las respuestas?",
+        "Nada. Las respuestas no salen del dispositivo: no existe registro, base de datos, cookies ni medición de audiencia. Al cerrar la página, se eliminan."],
+      ["¿Se pueden consultar los datos?",
+        "Sí. En los resultados se muestra, para cada propuesta, la cita del programa en la que se basa la postura de cada partido. La tabla completa puede descargarse en <a href=\"#/fuentes\">Fuentes</a>."]
     ];
+    var contacto = [];
+    if (c.contacto) contacto.push('Correo: <a href="mailto:' + esc(c.contacto) + '">' + esc(c.contacto) + "</a>");
+    if (c.linkedin) contacto.push("LinkedIn: " + externo(c.linkedin, esc(c.autoria || "perfil")));
+    if (c.repositorio) contacto.push("Código y datos: " + externo(c.repositorio, "repositorio público"));
 
     app.innerHTML =
       '<section class="heroe"><div class="heroe-in"><div>' +
       "<h1>¿Qué programa se parece más a lo que piensas?</h1>" +
-      '<p class="lead">Lee propuestas copiadas literalmente de los programas electorales, sin saber de qué partido son, y di si estás a favor o en contra. Al final verás con quién coincides y por qué.</p>' +
-      '<div class="fila-botones"><a class="boton" href="#/test">' + (testEmpezado() ? "Seguir el test" : "Empezar el test") + '</a>' +
+      '<p class="lead">Valora propuestas extraídas literalmente de los programas electorales sin saber qué partido las formula. Al terminar, verás tu grado de coincidencia con cada partido y en qué se basa cada resultado.</p>' +
+      '<div class="fila-botones"><a class="boton" href="#/test">' + empezar + '</a>' +
       '<a class="boton claro" href="#/como-funciona">Cómo funciona</a></div>' +
-      '<p class="nota">Son ' + N + " propuestas y se tarda unos " + MINUTOS + " minutos. No hace falta registrarse y no guardamos tus respuestas.</p>" +
+      '<p class="nota">El test consta de ' + N + " propuestas y requiere unos " + MINUTOS + " minutos. No es necesario registrarse y las respuestas no se almacenan.</p>" +
       "</div>" + brujulaSVG() + "</div></section>" +
 
       '<section class="seccion alterna" id="como-funciona"><div class="contenido">' +
-      '<div class="cab-seccion"><h2>Cómo funciona</h2><p class="lead">Tres pasos. Sin trampas y con todas las fuentes a la vista.</p></div>' +
+      '<div class="cab-seccion"><h2>Cómo funciona</h2><p class="lead">El test se desarrolla en tres pasos.</p></div>' +
       '<ol class="pasos">' +
-      '<li class="paso"><h3>Lees una propuesta</h3><p>Cada una es una frase literal de un programa electoral. No verás el partido, el logo ni el color hasta el final. Hay ' + POR_PARTIDO + " de cada partido.</p></li>" +
-      '<li class="paso"><h3>Das tu opinión</h3><p>Eliges entre «muy en contra» y «muy a favor». Si un tema pesa mucho en tu voto, márcalo como importante y contará el doble.</p></li>' +
-      '<li class="paso"><h3>Ves con quién coincides</h3><p>Obtienes tu porcentaje de afinidad con cada partido y, propuesta a propuesta, a quién pertenece y qué opina cada partido, con la cita y la página de su programa.</p></li>' +
+      '<li class="paso"><h3>Lectura</h3><p>Cada propuesta reproduce literalmente un fragmento de un programa electoral. El partido que la formula no se muestra hasta el final. Cada partido aporta ' + POR_PARTIDO + " propuestas.</p></li>" +
+      '<li class="paso"><h3>Valoración</h3><p>Cada propuesta se valora en una escala de cinco niveles, de «muy en contra» a «muy a favor». Las propuestas marcadas como importantes tienen doble peso en el cálculo.</p></li>' +
+      '<li class="paso"><h3>Resultado</h3><p>Se muestra el grado de coincidencia con cada partido y, para cada propuesta, su autoría, su referencia en el programa y la postura del resto de partidos, con la cita que la fundamenta.</p></li>' +
       "</ol>" +
       '<div class="simulador" id="simulador"></div>' +
       "</div></section>" +
 
-      '<section class="seccion" id="confianza"><div class="contenido">' +
-      '<div class="cab-seccion"><h2>Por qué puedes fiarte</h2><p class="lead">Una herramienta así solo es útil si es neutral. Estas son las reglas que seguimos.</p></div>' +
+      '<section class="seccion" id="neutralidad"><div class="contenido">' +
+      '<div class="cab-seccion"><h2>Garantías de neutralidad</h2><p class="lead">Una herramienta de orientación de voto solo es útil si es imparcial. Estos son los criterios que se aplican.</p></div>' +
       '<div class="principios">' +
-      '<div class="principio"><h3>Texto literal, con su fuente</h3><p>No resumimos ni reescribimos las propuestas. Cada una indica de qué programa y de qué página sale, con enlace al documento original.</p></div>' +
-      '<div class="principio"><h3>El mismo peso para cada partido</h3><p>' + POR_PARTIDO + " propuestas de cada programa, sea cual sea su extensión. Ningún partido aparece más veces que otro.</p></div>" +
-      '<div class="principio"><h3>Comprobado antes de publicar</h3><p>El cálculo se somete a seis pruebas con miles de usuarios simulados. Solo se publica si las supera todas. <a href="#/metodologia">Ver las pruebas</a>.</p></div>' +
-      '<div class="principio"><h3>Tus respuestas no salen de tu dispositivo</h3><p>No hay registro, base de datos ni cookies. El resultado se calcula en tu propio navegador.</p></div>' +
+      '<div class="principio"><h3>Texto literal y verificable</h3><p>Las propuestas no se resumen ni se reformulan. Cada una indica el programa y la página de procedencia, con enlace al documento original.</p></div>' +
+      '<div class="principio"><h3>Igual peso para cada partido</h3><p>Todos los partidos aportan el mismo número de propuestas (' + POR_PARTIDO + "), con independencia de la extensión de su programa.</p></div>" +
+      '<div class="principio"><h3>Validación previa a la publicación</h3><p>El método de cálculo se somete a seis controles con miles de usuarios simulados. Una versión solo se publica si los supera todos. <a href="#/metodologia">Ver los controles</a>.</p></div>' +
+      '<div class="principio"><h3>Privacidad</h3><p>No hay registro, base de datos ni cookies. El cálculo se realiza íntegramente en el navegador de cada persona.</p></div>' +
       "</div></div></section>" +
 
       '<section class="seccion oscura" id="nosotros"><div class="contenido dos-col">' +
-      "<div><h2>Nuestro objetivo</h2>" +
-      "<p>Los programas electorales son largos y casi nadie los lee enteros. Queremos acercarte a lo que proponen de verdad los partidos, sin intermediarios ni interpretaciones.</p>" +
-      "<p>Brújula 29N no te dice a quién votar. Te muestra con qué propuestas coincides para que decidas tú, con la información de primera mano.</p></div>" +
+      "<div><h2>Objetivo</h2>" +
+      "<p>Los programas electorales son documentos extensos que pocas personas leen de forma íntegra. Brújula 29N facilita el acceso directo a lo que proponen los partidos, sin intermediarios ni interpretaciones.</p>" +
+      "<p>La herramienta no recomienda el voto: muestra el grado de coincidencia con cada programa para que cada persona extraiga sus propias conclusiones.</p></div>" +
       "<div><h2>Quiénes somos</h2><p>" + esc(c.quienes_somos) + "</p>" +
-      (c.contacto ? '<p>Si encuentras un error en una cita o en una postura, escríbenos a <a href="mailto:' + esc(c.contacto) + '">' + esc(c.contacto) + "</a>.</p>" : "") +
-      (c.repositorio ? '<p>El código y los datos son públicos: <a href="' + esc(c.repositorio) + '" target="_blank" rel="noopener">ver el repositorio</a>.</p>' : "") +
+      (contacto.length ? "<p>Para comunicar un error en una cita o en la postura asignada a un partido, o para cualquier consulta:</p><p>" + contacto.join("<br>") + "</p>" : "") +
       "</div></div></section>" +
 
       '<section class="seccion" id="preguntas"><div class="contenido"><div style="max-width:var(--lectura)">' +
@@ -179,38 +181,37 @@
       faq.map(function (f) { return "<details><summary>" + f[0] + '</summary><div class="resp">' + f[1] + "</div></details>"; }).join("") +
       "</div></div></div></section>" +
 
-      '<section class="seccion alterna llamada"><div class="llamada-in"><h2>¿Empezamos? Son unos ' + MINUTOS + " minutos.</h2>" +
-      '<a class="boton" href="#/test">' + (testEmpezado() ? "Seguir el test" : "Empezar el test") + "</a></div></section>";
+      '<section class="seccion alterna llamada"><div class="llamada-in"><h2>El test requiere unos ' + MINUTOS + " minutos.</h2>" +
+      '<a class="boton" href="#/test">' + empezar + "</a></div></section>";
 
     pintarSimulador();
   }
 
-  // Ejemplo interactivo: cómo se compara una respuesta con la postura de cada partido.
+  // Ejemplo interactivo: cercanía entre una respuesta y la postura de cada partido.
   var sim = { u: 1, imp: false };
   function pintarSimulador() {
     var caja = document.getElementById("simulador");
     if (!caja) return;
     var partidosEj = [["Partido A", 2], ["Partido B", 0], ["Partido C", -1]];
     var filas = partidosEj.map(function (p) {
-      var d = Math.abs(sim.u - p[1]);
-      var cerca = 100 * (1 - d / 4);
+      var cerca = 100 * (1 - Math.abs(sim.u - p[1]) / 4);
       return '<div class="mini-fila"><span class="nom">' + p[0] + "<small>" + etiqueta(p[1]) + "</small></span>" +
         '<span class="pista" aria-hidden="true"><span style="width:' + cerca + '%"></span></span>' +
         '<span class="val">' + pct(cerca) + "</span></div>";
     }).join("");
     caja.innerHTML =
-      "<div><h3>Pruébalo con un ejemplo</h3>" +
-      '<p class="tenue">Imagina esta propuesta y tres partidos con posturas distintas. Elige tu respuesta y mira cómo cambia la cercanía con cada uno.</p>' +
+      "<div><h3>Ejemplo de cálculo</h3>" +
+      '<p class="tenue">Propuesta ficticia y tres partidos con posturas distintas. Selecciona una respuesta para ver la cercanía con cada uno.</p>' +
       '<p class="ejemplo">«Ampliar el horario de las bibliotecas públicas.»</p>' +
-      '<div class="opciones-mini" role="group" aria-label="Tu respuesta de ejemplo">' +
+      '<div class="opciones-mini" role="group" aria-label="Respuesta de ejemplo">' +
       ESCALA.map(function (o) { return '<button type="button" data-v="' + o.v + '" aria-pressed="' + (sim.u === o.v) + '">' + o.t + "</button>"; }).join("") +
       "</div>" +
       '<label class="importa" style="margin-top:1rem;display:inline-flex"><input type="checkbox" id="sim-imp"' + (sim.imp ? " checked" : "") + "> Esto me importa mucho <small>(cuenta el doble)</small></label></div>" +
       '<div class="resultado-mini" aria-live="polite"><p class="peq tenue" style="margin-bottom:.4rem">Cercanía en esta propuesta</p>' + filas +
       '<p class="explica-mini">' + (sim.imp
-        ? "Como la has marcado como importante, esta propuesta pesará el doble que las demás al hacer la media final."
-        : "Coinciden del todo si pensáis igual (100 %) y nada si pensáis lo contrario (0 %).") +
-      " Tu resultado final hace la media de todas las propuestas y la compara con lo que saldría respondiendo al azar.</p></div>";
+        ? "Al marcarla como importante, esta propuesta tendrá doble peso en el promedio final."
+        : "La cercanía es del 100 % cuando la respuesta coincide con la postura del partido y del 0 % cuando es la opuesta.") +
+      " El resultado final promedia todas las propuestas respondidas y lo compara con el que se obtendría respondiendo al azar.</p></div>";
     caja.querySelectorAll("button[data-v]").forEach(function (b) {
       b.onclick = function () { sim.u = Number(b.getAttribute("data-v")); pintarSimulador(); };
     });
@@ -296,10 +297,10 @@
     if (!testEmpezado()) return ir("#/");
     var n = validas(), min = D.config.min_respuestas;
     if (n < min) {
-      app.innerHTML = '<div class="pantalla"><h1>Faltan respuestas</h1>' +
-        "<p>Has dado tu opinión en " + n + " propuestas. Para que el resultado sea fiable hacen falta al menos " + min +
-        ". Puedes volver y cambiar algunas de las que marcaste como «no lo sé».</p>" +
-        '<div class="fila-botones"><button class="boton" id="revisar">Volver a las propuestas</button>' +
+      app.innerHTML = '<div class="pantalla"><h1>Respuestas insuficientes</h1>' +
+        "<p>Has valorado " + n + " propuestas. Para obtener un resultado fiable se necesitan al menos " + min +
+        ". Puedes revisar las propuestas que marcaste como «no lo sé».</p>" +
+        '<div class="fila-botones"><button class="boton" id="revisar">Revisar las propuestas</button>' +
         '<button class="boton claro" id="reiniciar">Empezar de nuevo</button></div></div>';
       document.getElementById("revisar").onclick = function () { estado.idx = 0; ir("#/test"); };
       document.getElementById("reiniciar").onclick = function () { estado = nuevoEstado(); ir("#/test"); };
@@ -315,12 +316,12 @@
     var nImp = D.propuestas.filter(function (q) { return estado.resp[q.id] && estado.resp[q.id].imp && estado.resp[q.id].v != null; }).length;
 
     var veredicto = claro
-      ? '<p class="tit">Coincides más con ' + esc(nombre(p1.id)) + ".</p>" +
-        "<p>Es un resultado claro: al repetir el cálculo " + D.parametros.bootstrap.toLocaleString("es") + " veces con distintas combinaciones de tus respuestas, " +
-        esc(nombre(p1.id)) + " queda primero en el " + pct(100 * p1.cuota) + " de los casos.</p>"
+      ? '<p class="tit">Mayor coincidencia: ' + esc(nombre(p1.id)) + ".</p>" +
+        "<p>El resultado es sólido: al repetir el cálculo " + REPETICIONES + " veces con distintas combinaciones de tus respuestas, " +
+        esc(nombre(p1.id)) + " ocupa el primer lugar en el " + pct(100 * p1.cuota) + " de los casos.</p>"
       : '<p class="tit">Empate técnico entre ' + esc(nombre(p1.id)) + " y " + esc(nombre(p2.id)) + ".</p>" +
-        "<p>" + esc(nombre(p1.id)) + " queda por delante, pero al repetir el cálculo " + D.parametros.bootstrap.toLocaleString("es") +
-        " veces con distintas combinaciones de tus respuestas solo queda primero en el " + pct(100 * p1.cuota) + " de los casos. La diferencia depende de muy pocas propuestas.</p>";
+        "<p>" + esc(nombre(p1.id)) + " obtiene la mayor coincidencia, pero al repetir el cálculo " + REPETICIONES +
+        " veces con distintas combinaciones de tus respuestas solo ocupa el primer lugar en el " + pct(100 * p1.cuota) + " de los casos. La diferencia depende de muy pocas propuestas.</p>";
 
     var ranking = orden.map(function (r) {
       return '<li><div class="cab"><span class="nombre">' + esc(nombre(r.id)) + '</span><span class="pct">' + pct(r.ajustado) + "</span></div>" +
@@ -336,12 +337,12 @@
       '<div class="pantalla"><h1>Tu resultado</h1>' +
       '<div class="veredicto">' + veredicto + "</div>" +
       '<ol class="ranking">' + ranking + "</ol>" +
-      '<p class="leyenda-azar"><i aria-hidden="true"></i><span>La raya marca el 50 %: lo que coincidirías con cualquier partido respondiendo al azar.' +
-      (nImp ? " Las " + nImp + " propuestas que marcaste como importantes han contado el doble." : "") + "</span></p>" +
+      '<p class="leyenda-azar"><i aria-hidden="true"></i><span>La línea vertical marca el 50 %, la coincidencia esperable respondiendo al azar.' +
+      (nImp ? " " + (nImp === 1 ? "La propuesta marcada como importante ha tenido" : "Las " + nImp + " propuestas marcadas como importantes han tenido") + " doble peso." : "") + "</span></p>" +
       '<div class="fila-botones"><button class="boton claro" id="otra-vez">Repetir el test</button><a href="#/metodologia">Cómo se calcula</a></div>' +
 
       '<section class="bloque-desglose"><h2>Propuesta a propuesta</h2>' +
-      "<p>Ahora puedes ver de quién era cada propuesta, dónde está en su programa y qué opina cada partido. Despliega «Por qué cada partido está aquí» para leer la cita en la que se basa cada postura.</p>" +
+      "<p>Para cada propuesta se muestran su autoría, su referencia en el programa y la postura de cada partido. En «Fundamento de cada postura» figura la cita del programa en la que se basa.</p>" +
       '<div class="filtros">' +
       '<label>Tema<select id="f-tema"><option value="">Todos</option>' +
       temas.map(function (t) { return '<option value="' + esc(t) + '"' + (estado.filtroTema === t ? " selected" : "") + ">" + esc(t) + "</option>"; }).join("") +
@@ -350,7 +351,7 @@
       D.partidos.map(function (p) { return '<option value="' + esc(p.id) + '"' + (estado.resaltar === p.id ? " selected" : "") + ">" + esc(p.nombre) + "</option>"; }).join("") +
       "</select></label>" +
       '<button class="boton-texto" id="abrir-todas">' + (estado.abiertas ? "Ocultar todas las citas" : "Mostrar todas las citas") + "</button></div>" +
-      '<div class="leyenda-regla"><span><i class="lp"></i>Postura de cada partido según su programa</span><span><i class="la"></i>Partido que hizo la propuesta</span><span><i class="lt"></i>Tu respuesta</span></div>' +
+      '<div class="leyenda-regla"><span><i class="lp"></i>Postura de cada partido según su programa</span><span><i class="la"></i>Partido que formula la propuesta</span><span><i class="lt"></i>Tu respuesta</span></div>' +
       '<ol class="desglose" id="desglose"></ol></section></div>';
 
     document.getElementById("otra-vez").onclick = function () { estado = nuevoEstado(); ir("#/test"); };
@@ -382,7 +383,7 @@
       var cls = "fila" + (p.id === q.autor ? " autor-fila" : "") +
         (estado.resaltar ? (estado.resaltar === p.id ? " resaltada" : " atenuada") : "");
       var dentro = po.v == null
-        ? '<span class="silencio">Su programa no se pronuncia</span>'
+        ? '<span class="silencio">Sin pronunciamiento en su programa</span>'
         : ESCALA.map(function (o) {
             return '<span class="celda">' + (o.v === po.v ? '<span class="marca-p" title="' + esc(etiqueta(po.v)) + '"></span>' : "") + "</span>";
           }).join("");
@@ -391,20 +392,20 @@
 
     var accesible = D.partidos.map(function (p) {
       var v = q.posturas[p.id] ? q.posturas[p.id].v : null;
-      return p.nombre + ": " + (v == null ? "no se pronuncia" : etiqueta(v).toLowerCase());
+      return p.nombre + ": " + (v == null ? "sin pronunciamiento" : etiqueta(v).toLowerCase());
     }).join("; ") + ". Tu respuesta: " + (uv == null ? "ninguna" : etiqueta(uv).toLowerCase()) + ".";
 
-    var tuRespuesta = !r ? "No llegaste a responder esta propuesta."
-      : r.v == null ? "Respondiste <strong>no lo sé</strong>: no cuenta para el resultado."
-      : "Respondiste <strong>" + etiqueta(r.v).toLowerCase() + "</strong>" + (r.imp ? " y la marcaste como importante: ha contado el doble" : "") + ".";
+    var tuRespuesta = !r ? "No respondiste a esta propuesta."
+      : r.v == null ? "Respondiste <strong>no lo sé</strong>: esta propuesta no interviene en tu resultado."
+      : "Respondiste <strong>" + etiqueta(r.v).toLowerCase() + "</strong>" + (r.imp ? " y la marcaste como importante, por lo que ha tenido doble peso" : "") + ".";
 
     var justif = D.partidos.map(function (p) {
       var po = q.posturas[p.id] || {};
       var esAutor = p.id === q.autor;
       var cuerpo = po.v == null
-        ? '<span class="tenue">Su programa no recoge una postura sobre esta propuesta, así que no se le compara en ella.</span>'
+        ? '<span class="tenue">Su programa no se pronuncia sobre esta cuestión, por lo que no se le compara en esta propuesta.</span>'
         : '<span class="jpos">' + esc(etiqueta(po.v)) + (esAutor ? " · autor de la propuesta" : "") + "</span><br>" +
-          (esAutor ? '<span class="tenue">Es el partido que la propone.</span>' : "<q>" + esc(po.cita) + "</q>") +
+          (esAutor ? '<span class="tenue">Formula la propuesta en su programa.</span>' : "<q>" + esc(po.cita) + "</q>") +
           '<span class="jref">' + refHTML(p.id, po.pagina) + "</span>";
       return '<li><span class="jp">' + esc(p.nombre) + "</span><div>" + cuerpo + "</div></li>";
     }).join("");
@@ -418,25 +419,67 @@
       '<div class="cuerpo"' + (uv != null ? ' style="--pos:' + (uv + 2) + '"' : "") + ">" +
       (uv != null ? '<div class="tu-col" aria-hidden="true"></div>' : "") + filas + "</div></div>" +
       '<p class="respuesta-usuario">' + tuRespuesta + "</p>" +
-      '<details class="justif"' + (estado.abiertas ? " open" : "") + "><summary>Por qué cada partido está aquí</summary>" +
+      '<details class="justif"' + (estado.abiertas ? " open" : "") + "><summary>Fundamento de cada postura</summary>" +
       '<ul class="justif-lista">' + justif + "</ul></details>" +
       "</li>";
   }
 
   // ---------- metodología ----------
   var EXPLICA = {
-    "Votante perfecto": "Simulamos a una persona que responde exactamente lo que dice el programa de cada partido. El test debe asignarle ese partido.",
-    "Votante realista": "Simulamos 5.000 personas por partido que piensan parecido a él, pero no igual: cambian parte de sus respuestas y dejan algunas en blanco. A la gran mayoría le debe seguir saliendo su partido.",
-    "Votante al azar": "Simulamos 100.000 personas que responden al azar. Ningún partido debe salir favorecido: todos deben ganar un número de veces parecido.",
-    "Todo sí / todo no": "Simulamos personas que marcan siempre la misma respuesta, sin leer. No deben quedar asignadas claramente a ningún partido.",
-    "Pregunta decisiva": "Quitamos cada propuesta, de una en una. Ninguna debe poder cambiar por sí sola el resultado.",
-    "Otra fórmula": "Repetimos el cálculo con otra forma de medir la distancia entre respuestas. El ganador debe ser el mismo en casi todos los casos."
+    "Coincidencia perfecta": "Se simula, para cada partido, a una persona cuyas respuestas coinciden exactamente con las posturas de su programa. El test debe asignarle ese partido.",
+    "Votante realista": "Se simulan 5.000 personas por partido con posiciones próximas a las de ese partido, pero no idénticas: parte de sus respuestas se desvían un nivel y otras quedan sin responder. La gran mayoría debe obtener ese partido como resultado.",
+    "Respuestas aleatorias": "Se simulan 100.000 personas que responden al azar. Ningún partido debe resultar favorecido: todos deben ocupar el primer puesto con una frecuencia similar.",
+    "Respuesta uniforme": "Se simulan personas que eligen siempre la misma respuesta. No deben quedar asignadas con claridad a ningún partido.",
+    "Influencia de una sola propuesta": "Se elimina cada propuesta de una en una y se repite el cálculo. Ninguna debe alterar por sí sola el resultado.",
+    "Robustez del método": "Se repite el cálculo con una medida de distancia alternativa. El partido con mayor coincidencia debe ser el mismo en la práctica totalidad de los casos."
   };
+
+  function mi(x) { return "<mi>" + x + "</mi>"; }
+  function mn(x) { return "<mn>" + x + "</mn>"; }
+  function mo(x) { return "<mo>" + x + "</mo>"; }
+  function arg(x) { return '<mo stretchy="false">(</mo>' + x + '<mo stretchy="false">)</mo>'; }
+  function frac(a, b) { return "<mfrac><mrow>" + a + "</mrow><mrow>" + b + "</mrow></mfrac>"; }
+  function sub(a, b) { return "<msub>" + a + b + "</msub>"; }
+  function abs(x) { return '<mrow><mo stretchy="false">|</mo>' + x + '<mo stretchy="false">|</mo></mrow>'; }
+  function ecuacion(cuerpo, etiquetaEc) {
+    return '<div class="ecuacion"><math display="block"><mrow>' + cuerpo + "</mrow></math>" +
+      (etiquetaEc ? '<span class="ec-num">(' + etiquetaEc + ")</span>" : "") + "</div>";
+  }
+
+  function formulas() {
+    var ci = sub(mi("c"), mi("i")), ri = sub(mi("r"), mi("i")), pi = sub(mi("p"), mi("i")),
+        wi = sub(mi("w"), mi("i")), ki = sub(mi("κ"), mi("i"));
+    var cbar = '<mover><mi>c</mi><mo>‾</mo></mover>';
+    var k = D.parametros.k;
+    return '<div class="formula">' +
+      ecuacion(ci + mo("=") + mn("1") + mo("−") + frac(abs(ri + mo("−") + pi), mn("4")), "1") +
+      ecuacion(cbar + arg(mi("p")) + mo("=") + frac(mn("1"), mn("5")) +
+        '<munderover><mo>∑</mo><mrow><mi>r</mi><mo>=</mo><mo>−</mo><mn>2</mn></mrow><mn>2</mn></munderover>' +
+        mo("(") + mn("1") + mo("−") + frac(abs(mi("r") + mo("−") + mi("p")), mn("4")) + mo(")"), "2") +
+      ecuacion(ki + mo("=") + frac(ci + mo("−") + cbar + arg(pi), mn("1") + mo("−") + cbar + arg(pi)), "3") +
+      ecuacion(mi("C") + mo("=") + mn("50") + mo("+") + mn("50") + mo("·") +
+        frac('<munder><mo>∑</mo><mi>i</mi></munder>' + wi + ki, '<munder><mo>∑</mo><mi>i</mi></munder>' + wi), "4") +
+      ecuacion(mi("R") + mo("=") + frac(mi("n") + mo("·") + mi("C") + mo("+") + mn(k) + mo("·") + mn("50"), mi("n") + mo("+") + mn(k)), "5") +
+      "</div>" +
+      '<table class="tabla-esc leyenda-formula"><tbody>' +
+      "<tr><td><math>" + ri + "</math></td><td>Respuesta a la propuesta <em>i</em>, de −2 (muy en contra) a +2 (muy a favor).</td></tr>" +
+      "<tr><td><math>" + pi + "</math></td><td>Postura del partido sobre la propuesta <em>i</em>, en la misma escala.</td></tr>" +
+      "<tr><td><math>" + ci + "</math></td><td>Cercanía entre respuesta y postura: 1 si coinciden, 0 si ocupan extremos opuestos.</td></tr>" +
+      "<tr><td><math>" + cbar + arg(mi("p")) + "</math></td><td>Cercanía esperada al azar para una postura <em>p</em>: media de la cercanía con las cinco respuestas posibles.</td></tr>" +
+      "<tr><td><math>" + ki + "</math></td><td>Cercanía corregida por azar: 1 si coinciden, 0 si es la esperable al azar, negativa si es inferior.</td></tr>" +
+      "<tr><td><math>" + wi + "</math></td><td>Peso de la propuesta: 2 si se ha marcado como importante y 1 en caso contrario.</td></tr>" +
+      "<tr><td><math><mi>C</mi></math></td><td>Coincidencia, en porcentaje: 100 % equivale a coincidencia plena y 50 % a la esperable al azar.</td></tr>" +
+      "<tr><td><math><mi>n</mi></math></td><td>Número de propuestas en que se compara al partido (respondidas y con postura del partido).</td></tr>" +
+      "<tr><td><math><mi>R</mi></math></td><td>Resultado final, con el ajuste por número de comparaciones (<em>k</em> = " + k + ").</td></tr>" +
+      "</tbody></table>" +
+      '<p class="peq tenue">Solo intervienen las propuestas respondidas (excluidas las respuestas «no lo sé») sobre las que el partido se pronuncia. La corrección por azar sigue el planteamiento del coeficiente de acuerdo de Cohen (1960).</p>';
+  }
 
   function pintarMetodologia() {
     var v = D.validacion;
     var controles = v.pruebas.map(function (p) {
-      return '<li class="control"><div class="control-cab"><h3>' + esc(p.prueba) + "</h3>" + (p.ok ? '<span class="sello">' + CHECK + "Superada</span>" : '<span class="sello" style="color:var(--texto);background:var(--fondo-2)">No superada</span>') + "</div>" +
+      return '<li class="control"><div class="control-cab"><h3>' + esc(p.prueba) + "</h3>" +
+        (p.ok ? '<span class="sello">' + CHECK + "Superado</span>" : '<span class="sello" style="color:var(--texto);background:var(--fondo-2)">No superado</span>') + "</div>" +
         "<p>" + esc(EXPLICA[p.prueba] || p.que) + "</p>" +
         '<p class="res"><strong>Criterio:</strong> ' + esc(p.criterio) + "<br><strong>Resultado:</strong> " + esc(p.resultado) + "</p></li>";
     }).join("");
@@ -444,64 +487,61 @@
 
     app.innerHTML =
       '<article class="pagina"><h1>Metodología</h1>' +
-      '<p class="lead">Cómo elegimos las propuestas, cómo sabemos qué opina cada partido y cómo se calcula tu resultado.</p>' +
-      '<div class="resumen"><ul>' +
-      "<li>Propuestas literales: " + POR_PARTIDO + " de cada partido, con su página del programa.</li>" +
-      "<li>La postura de cada partido sale de una cita de su propio programa.</li>" +
-      "<li>Tu resultado compara tus respuestas con esas posturas; lo importante cuenta el doble.</li>" +
-      "<li>Antes de publicar, el cálculo supera seis controles de calidad.</li>" +
-      "<li>No se guarda nada de lo que respondes.</li></ul></div>" +
-      '<nav class="indice" aria-label="En esta página"><a href="#m-partidos">Partidos</a><a href="#m-propuestas">Propuestas</a><a href="#m-posturas">Posturas</a><a href="#m-calculo">Cálculo</a><a href="#m-importante">Lo importante</a><a href="#m-empate">Empate técnico</a><a href="#m-controles">Controles</a><a href="#m-privacidad">Privacidad</a></nav>' +
+      '<p class="lead">Criterios de selección de las propuestas, asignación de posturas y cálculo del resultado.</p>' +
+      '<div class="resumen"><p class="resumen-tit">En síntesis</p><ul>' +
+      "<li>Cada programa aporta " + POR_PARTIDO + " propuestas literales, con su referencia de página.</li>" +
+      "<li>La postura de cada partido se asigna a partir de una cita de su propio programa.</li>" +
+      "<li>El resultado mide la coincidencia entre las respuestas y esas posturas, corregida por el efecto del azar.</li>" +
+      "<li>Antes de cada publicación, el cálculo supera seis controles de calidad.</li>" +
+      "<li>Las respuestas no se almacenan.</li></ul></div>" +
+      '<nav class="indice" aria-label="En esta página"><a href="#m-partidos">1. Partidos</a><a href="#m-propuestas">2. Propuestas</a><a href="#m-posturas">3. Posturas</a><a href="#m-calculo">4. Cálculo</a><a href="#m-importante">5. Propuestas importantes</a><a href="#m-empate">6. Empate técnico</a><a href="#m-controles">7. Controles de calidad</a><a href="#m-privacidad">8. Privacidad</a></nav>' +
 
-      '<h2 id="m-partidos">Qué partidos aparecen</h2><p>' + esc(D.config.nota_partidos) + "</p>" +
+      '<h2 id="m-partidos">1. Partidos incluidos</h2><p>' + esc(D.config.nota_partidos) + "</p>" +
 
-      '<h2 id="m-propuestas">Cómo se eligen las propuestas</h2>' +
-      "<p>De cada programa se toman " + POR_PARTIDO + " propuestas, para que ningún partido aparezca más que otro. Cada una debe cumplir cuatro reglas:</p><ol>" +
-      "<li><strong>Concreta.</strong> Una medida que se pueda cumplir o no, no una declaración general.</li>" +
-      "<li><strong>Que distinga.</strong> Al menos un partido la apoya y otro la rechaza; si todos opinan igual, no ayuda a decidir.</li>" +
-      "<li><strong>Que no delate a su autor.</strong> Se descartan las que nombran al partido, a sus líderes o a sus rivales. El único retoque permitido es sustituir un nombre propio por [corchetes].</li>" +
-      "<li><strong>Que se entienda sola.</strong> Cuando usa un término técnico, añadimos una aclaración aparte, sin tocar el texto original.</li></ol>" +
-      "<p>El texto nunca se reescribe. Si una frase es demasiado larga, se recorta y el corte se marca con […]. Los títulos que el programa escribe en mayúsculas se transcriben en minúscula, sin cambiar ninguna palabra.</p>" +
-      "<p>Además se reparten entre temas distintos y aparecen en un orden aleatorio para cada persona.</p>" +
+      '<h2 id="m-propuestas">2. Selección de las propuestas</h2>' +
+      "<p>Cada programa aporta " + POR_PARTIDO + " propuestas, de modo que todos los partidos tienen la misma presencia en el test. Cada propuesta debe cumplir los siguientes criterios:</p><ul>" +
+      "<li><strong>Concreción.</strong> Debe tratarse de una medida verificable, no de una declaración de intenciones.</li>" +
+      "<li><strong>Capacidad de discriminación.</strong> Los partidos deben mantener posturas diferentes sobre ella.</li>" +
+      "<li><strong>Neutralidad formal.</strong> No menciona partidos, dirigentes ni adversarios, ni emplea expresiones características de un partido. Se evitan, en la medida de lo posible, las propuestas emblemáticas que permiten identificar de inmediato a su autor.</li>" +
+      "<li><strong>Comprensibilidad.</strong> Debe poder entenderse de forma aislada. Los términos técnicos se explican en una aclaración separada del texto original.</li></ul>" +
+      "<p><strong>Integridad del texto.</strong> El texto no se reformula. Las frases extensas se recortan y el corte se señala con […]. El único cambio admitido es sustituir un nombre propio por una referencia entre corchetes. Los fragmentos escritos en mayúsculas en el original se transcriben en minúsculas, sin alterar ninguna palabra. Las aclaraciones describen la situación vigente en la fecha de publicación de los programas.</p>" +
+      "<p><strong>Equilibrio.</strong> Las propuestas se distribuyen entre distintos ámbitos temáticos e incluyen pares de signo contrario sobre un mismo asunto, de modo que la tendencia a responder siempre de forma afirmativa no favorezca a ningún partido. Se presentan en un orden aleatorio, distinto para cada persona, para evitar efectos de orden.</p>" +
 
-      '<h2 id="m-posturas">Cómo sabemos qué opina cada partido</h2>' +
-      "<p>Para cada propuesta anotamos la postura de <em>todos</em> los partidos, no solo la del que la hizo. Así, si estás de acuerdo con una propuesta, te acerca a quienes la apoyan y te aleja de quienes la rechazan.</p>" +
-      '<table class="tabla-esc"><thead><tr><th>Postura</th><th>Cuándo se asigna</th></tr></thead><tbody>' +
-      "<tr><td>Muy a favor</td><td>La propone o la apoya claramente. El autor siempre está aquí.</td></tr>" +
-      "<tr><td>A favor</td><td>La apoya con matices o propone algo muy parecido.</td></tr>" +
-      "<tr><td>Neutral</td><td>Su programa recoge una postura intermedia.</td></tr>" +
-      "<tr><td>En contra</td><td>Propone algo distinto que choca con ella.</td></tr>" +
-      "<tr><td>Muy en contra</td><td>La rechaza expresamente o propone lo contrario.</td></tr>" +
-      "<tr><td>No se pronuncia</td><td>Su programa no dice nada. No se le compara en esa propuesta.</td></tr></tbody></table>" +
-      "<p>Cada postura se apoya en una cita literal del programa de ese partido, con su página. Puedes leerlas todas en tus resultados, en «Por qué cada partido está aquí», y descargarlas en <a href=\"#/fuentes\">Fuentes</a>.</p>" +
+      '<h2 id="m-posturas">3. Asignación de posturas</h2>' +
+      "<p>Para cada propuesta se registra la postura de todos los partidos, no únicamente la de su autor. De este modo, mostrar acuerdo con una propuesta aproxima el resultado a los partidos que la apoyan y lo aleja de los que la rechazan.</p>" +
+      '<table class="tabla-esc"><thead><tr><th>Postura</th><th>Criterio de asignación</th></tr></thead><tbody>' +
+      "<tr><td>Muy a favor</td><td>El partido formula la propuesta o la respalda expresamente. Es siempre la postura del autor.</td></tr>" +
+      "<tr><td>A favor</td><td>El partido respalda la propuesta con matices o formula una medida equivalente.</td></tr>" +
+      "<tr><td>Neutral</td><td>El programa recoge una posición intermedia.</td></tr>" +
+      "<tr><td>En contra</td><td>El partido formula una medida incompatible con la propuesta.</td></tr>" +
+      "<tr><td>Muy en contra</td><td>El partido rechaza expresamente la propuesta o defiende la medida opuesta.</td></tr>" +
+      "<tr><td>Sin pronunciamiento</td><td>El programa no aborda la cuestión. No se atribuye postura y el partido no se compara en esa propuesta.</td></tr></tbody></table>" +
+      "<p>Toda postura está respaldada por una cita literal del programa del partido, con indicación de página. Las citas pueden consultarse en los resultados y descargarse en <a href=\"#/fuentes\">Fuentes</a>.</p>" +
 
-      '<h2 id="m-calculo">Cómo se calcula tu resultado</h2>' +
-      "<p>En cada propuesta medimos lo cerca que estás de cada partido: 100 % si pensáis igual y 0 % si pensáis lo contrario. Después hacemos la media de todas las propuestas que respondiste.</p>" +
-      "<p>Esa media se compara con lo que coincidiría alguien respondiendo al azar. Por eso <strong>50 % significa «como el azar»</strong> y 100 % «exactamente igual». Esta corrección evita que salgan favorecidos los partidos con posturas más tibias, que si no saldrían más cerca de casi todo el mundo.</p>" +
-      "<p>Por último, si un partido no se pronuncia en muchas propuestas, su porcentaje se acerca ligeramente al 50 %, para que no salga arriba por casualidad con pocas comparaciones.</p>" +
-      '<details class="mas"><summary>Ver la fórmula exacta</summary><div class="formula">' +
-      "cercanía = 1 − |tu respuesta − postura del partido| / 4<br>" +
-      "κ = (cercanía − cercanía esperada al azar) / (1 − cercanía esperada al azar)<br>" +
-      "coincidencia = 50 + 50 × media ponderada de κ<br>" +
-      "resultado = (n × coincidencia + " + D.parametros.k + " × 50) / (n + " + D.parametros.k + ")</div>" +
-      '<p class="peq tenue" style="margin-top:.75rem">Las respuestas van de −2 (muy en contra) a +2 (muy a favor). n es el número de propuestas en que se compara a ese partido. La cercanía esperada al azar es la media de la cercanía con las cinco respuestas posibles. La corrección por azar sigue la idea del coeficiente de Cohen (1960); ver <a href="#/fuentes">Fuentes</a>.</p></details>' +
+      '<h2 id="m-calculo">4. Cálculo del resultado</h2>' +
+      "<p>El cálculo se realiza en tres pasos.</p><ol>" +
+      "<li><strong>Cercanía en cada propuesta.</strong> Se mide la distancia entre la respuesta y la postura del partido en la escala de cinco niveles. La cercanía vale 1 cuando coinciden y 0 cuando ocupan extremos opuestos.</li>" +
+      "<li><strong>Corrección por azar.</strong> La cercanía obtenida se compara con la que cabría esperar si se respondiera al azar. Sin esta corrección, los partidos con posturas intermedias obtendrían sistemáticamente una coincidencia más alta, porque una posición central está, en promedio, más próxima a cualquier respuesta. Tras la corrección, un 50 % equivale al resultado esperable por azar y un 100 %, a la coincidencia plena.</li>" +
+      "<li><strong>Ajuste por número de comparaciones.</strong> Si un partido no se pronuncia sobre varias propuestas, su resultado se apoya en menos comparaciones y es menos fiable. Para evitar que ocupe los primeros puestos por efecto del azar, su porcentaje se aproxima ligeramente al 50 %, tanto más cuantas menos comparaciones haya.</li></ol>" +
+      '<details class="mas"><summary>Ver las fórmulas</summary>' + formulas() + "</details>" +
 
-      '<h2 id="m-importante">Las propuestas que te importan mucho</h2>' +
-      "<p>Si marcas «Esto me importa mucho» en una propuesta, esa propuesta cuenta el doble en la media. Sirve para que el resultado refleje tus prioridades: no es lo mismo coincidir con un partido en lo que más te importa que en un tema secundario.</p>" +
-      "<p>Si no la marcas en ninguna, todas cuentan igual. Y las que respondes con «No lo sé» no cuentan nunca.</p>" +
+      '<h2 id="m-importante">5. Propuestas marcadas como importantes</h2>' +
+      "<p>Al marcar «Esto me importa mucho», la propuesta recibe un peso doble en el cálculo. El objetivo es que el resultado refleje las prioridades de cada persona: coincidir con un partido en los asuntos considerados prioritarios pesa más que coincidir en asuntos secundarios.</p>" +
+      "<p>Si no se marca ninguna propuesta, todas tienen el mismo peso. Las propuestas respondidas con «No lo sé» no intervienen en el cálculo.</p>" +
 
-      '<h2 id="m-empate">Empate técnico</h2>' +
-      "<p>Cuando dos partidos quedan muy cerca, el ganador puede depender de una o dos respuestas. Para detectarlo, repetimos tu cálculo " + D.parametros.bootstrap.toLocaleString("es") +
-      " veces con combinaciones al azar de tus propias respuestas (técnica <em>bootstrap</em>). Si el primero no queda primero en al menos el " + Math.round(D.parametros.umbral_empate * 100) +
-      " % de las repeticiones, te indicamos empate técnico en lugar de un ganador.</p>" +
+      '<h2 id="m-empate">6. Empate técnico</h2>' +
+      "<p>Cuando dos partidos obtienen resultados próximos, el orden entre ellos puede depender de muy pocas respuestas. Para medir la solidez del resultado, el cálculo se repite " + REPETICIONES +
+      " veces sobre muestras aleatorias de las propias respuestas (remuestreo <em>bootstrap</em>; Efron y Tibshirani, 1993). Si el partido con mayor coincidencia no ocupa el primer lugar en al menos el " + UMBRAL +
+      " % de las repeticiones, se indica empate técnico en lugar de un único resultado.</p>" +
 
-      '<h2 id="m-controles">Controles de calidad</h2>' +
-      "<p>Una herramienta neutral no se afirma, se comprueba. Antes de publicar cualquier versión de los datos, el cálculo se somete a seis controles con usuarios simulados por ordenador. Si alguno no se supera, no se publica: se revisa la selección de propuestas. Esta versión los superó todos el " + fecha + ".</p>" +
+      '<h2 id="m-controles">7. Controles de calidad</h2>' +
+      "<p>La neutralidad del método se verifica mediante simulación por ordenador (método de Monte Carlo). Antes de publicar cualquier versión de los datos, el cálculo se somete a seis controles con usuarios simulados. Una versión solo se publica si los supera todos; en caso contrario, se revisa la selección de propuestas, nunca la fórmula de cálculo.</p>" +
+      "<p>La versión actual superó todos los controles el " + fecha + ".</p>" +
       '<ul class="controles">' + controles + "</ul>" +
-      '<p class="peq tenue">Las simulaciones usan una semilla fija (' + v.semilla + "), así que cualquiera puede repetirlas y obtener los mismos números con el código público.</p>" +
+      '<p class="peq tenue">Las simulaciones utilizan una semilla aleatoria fija (' + v.semilla + "), de modo que cualquier persona puede reproducirlas con el código público y obtener los mismos resultados.</p>" +
 
-      '<h2 id="m-privacidad">Privacidad</h2>' +
-      "<p>Las opiniones políticas son datos especialmente protegidos por el Reglamento General de Protección de Datos. Por eso esta web no las recoge: no hay servidor, base de datos, cookies ni estadísticas de visitas. Todo el cálculo se hace en tu navegador y, al cerrar la página, tus respuestas desaparecen.</p>" +
+      '<h2 id="m-privacidad">8. Privacidad</h2>' +
+      "<p>Las opiniones políticas constituyen una categoría especial de datos personales según el Reglamento General de Protección de Datos (art. 9). Por ello, la herramienta no recoge ninguna respuesta: no utiliza servidor, base de datos, cookies ni herramientas de medición de audiencia. El cálculo se realiza íntegramente en el navegador y las respuestas se eliminan al cerrar la página.</p>" +
       '<div class="fila-botones" style="margin-top:2.5rem"><a class="boton" href="#/test">Hacer el test</a><a href="#/fuentes">Ver fuentes</a></div></article>';
     app.focus({ preventScroll: true });
   }
@@ -509,26 +549,26 @@
   // ---------- fuentes ----------
   function pintarFuentes() {
     var programas = D.partidos.map(function (p) {
-      return '<li><span class="ft">' + esc(p.nombre) + "</span> — " + esc(p.programa) +
-        '<span class="fu"><a href="' + esc(p.url) + '" target="_blank" rel="noopener">' + esc(p.url) + "</a></span></li>";
+      return '<li><span class="ft">' + esc(p.nombre) + "</span>. " + esc(p.programa) + "." +
+        '<span class="fu">' + externo(p.url, esc(p.url)) + "</span></li>";
     }).join("");
     var refs = (D.referencias || []).map(function (r) {
       return '<li><span class="ft">' + esc(r.autores) + " (" + esc(r.anio) + ").</span> " + esc(r.titulo) + ". <em>" + esc(r.publicacion) + "</em>." +
-        '<span class="fu">' + esc(r.uso) + (r.url ? ' <a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.url) + "</a>" : "") + "</span></li>";
+        '<span class="fu">' + esc(r.uso) + (r.url ? " " + externo(r.url, esc(r.url)) : "") + "</span></li>";
     }).join("");
     var c = D.config;
 
     app.innerHTML =
       '<article class="pagina"><h1>Fuentes</h1>' +
-      '<p class="lead">De dónde sale cada propuesta y cada postura, y en qué nos basamos para diseñar el cálculo.</p>' +
+      '<p class="lead">Procedencia de las propuestas y de las posturas, y referencias del método de cálculo.</p>' +
       "<h2>Programas electorales</h2>" +
-      "<p>Todas las propuestas y todas las citas se han copiado literalmente de estos documentos. En tus resultados, cada una enlaza a su página exacta. Los números de página corresponden a la página del archivo PDF, que es la que abre el enlace.</p>" +
+      "<p>Todas las propuestas y citas reproducen literalmente estos documentos. La numeración de páginas corresponde a la del archivo PDF, que es la que abre cada enlace.</p>" +
       '<ul class="lista-fuentes">' + programas + "</ul>" +
       "<h2>Datos descargables</h2>" +
       '<ul class="lista-fuentes">' +
-      '<li><span class="ft"><a href="datos/datos.xlsx">datos.xlsx</a></span><span class="fu">Las ' + N + " propuestas, la postura de cada partido, sus citas y sus páginas.</span></li>" +
+      '<li><span class="ft"><a href="datos/datos.xlsx">datos.xlsx</a></span><span class="fu">Las ' + N + " propuestas, la postura de cada partido y las citas y páginas que la fundamentan.</span></li>" +
       '<li><span class="ft"><a href="validacion.md">validacion.md</a></span><span class="fu">Informe técnico de los controles de calidad de esta versión.</span></li>' +
-      (c.repositorio ? '<li><span class="ft"><a href="' + esc(c.repositorio) + '" target="_blank" rel="noopener">Repositorio público</a></span><span class="fu">Código de la web, del cálculo y de las simulaciones, con el historial de todos los cambios.</span></li>' : "") +
+      (c.repositorio ? '<li><span class="ft">' + externo(c.repositorio, "Repositorio público") + '</span><span class="fu">Código de la web, del cálculo y de las simulaciones, con el historial completo de cambios.</span></li>' : "") +
       "</ul>" +
       "<h2>Referencias metodológicas</h2>" +
       '<ul class="lista-fuentes">' + refs + "</ul>" +

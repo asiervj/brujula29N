@@ -322,3 +322,14 @@ details.mas summary { cursor: pointer; font-weight: 500; color: var(--tinta); }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* fórmulas (MathML nativo) */
+math { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math", var(--serif); }
+.formula { padding: 1.25rem 1.5rem; }
+.ecuacion { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; padding: .55rem 0; }
+.ecuacion math { font-size: 1.2rem; color: var(--tinta); }
+.ec-num { color: var(--tenue); font-size: .9375rem; font-variant-numeric: tabular-nums; }
+.leyenda-formula td:first-child { width: 4.5rem; white-space: nowrap; }
+.leyenda-formula math { font-size: 1.05rem; }
+.resumen-tit { font-weight: 700; color: var(--tinta); margin-bottom: .5rem; }
+@media (max-width: 560px) { .ecuacion math { font-size: 1rem; } .formula { padding: 1rem; } }

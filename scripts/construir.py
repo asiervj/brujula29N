@@ -73,6 +73,7 @@ def leer_excel():
         "autoria": texto(cfg.get("autoria")),
         "quienes_somos": texto(cfg.get("quienes_somos")),
         "contacto": texto(cfg.get("contacto")),
+        "linkedin": texto(cfg.get("linkedin")),
         "repositorio": texto(cfg.get("repositorio")),
         "min_respuestas": entero(cfg.get("min_respuestas")) or 20,
         "nota_partidos": texto(cfg.get("nota_partidos")),
@@ -224,7 +225,7 @@ def puntuar(U, W, P, metrica="manhattan"):
 
 def pc(x, dec=0):
     """0.231 -> '23,1 %' (formato español)."""
-    return f"{100 * x:.{dec}f}".replace(".", ",") + " %"
+    return f"{100 * x:.{dec}f}".replace(".", ",") + "\u00a0%"
 
 
 def ganador(S, rng):
@@ -257,10 +258,10 @@ def pruebas(P, nombres, rng):
     ok = bool((g == np.arange(J)).all())
     fallos = [nombres[j] for j in range(J) if g[j] != j]
     res.append({
-        "prueba": "Votante perfecto",
-        "que": "Un usuario que responde exactamente lo que dice cada partido.",
-        "criterio": "Le sale su partido primero, siempre.",
-        "resultado": "Correcto en todos los partidos." if ok else "Falla en: " + ", ".join(fallos) + ".",
+        "prueba": "Coincidencia perfecta",
+        "que": "Respuestas idénticas a las posturas de cada partido.",
+        "criterio": "El partido correspondiente obtiene el primer puesto en todos los casos.",
+        "resultado": "Se cumple para todos los partidos." if ok else "No se cumple para: " + ", ".join(fallos) + ".",
         "ok": ok,
     })
 
@@ -276,9 +277,9 @@ def pruebas(P, nombres, rng):
     peor = int(np.argmin(diag))
     res.append({
         "prueba": "Votante realista",
-        "que": f"{N:,}".replace(",", ".") + " usuarios por partido que parten de sus posturas, con un 40 % de respuestas desviadas un punto y un 10 % de «no lo sé».",
-        "criterio": "Al menos al 80 % le sale su partido.",
-        "resultado": "Aciertos: " + ", ".join(f"{nombres[j]} {pc(diag[j])}" for j in range(J)) + f". El más bajo: {nombres[peor]}.",
+        "que": f"{N:,}".replace(",", ".") + " usuarios por partido que parten de sus posturas, con un 40 % de respuestas desviadas un nivel y un 10 % de «no lo sé».",
+        "criterio": "Al menos el 80 % obtiene como resultado el partido del que parte.",
+        "resultado": "Porcentaje de acierto: " + ", ".join(f"{nombres[j]} {pc(diag[j])}" for j in range(J)) + ".",
         "ok": ok,
         "confusion": [[round(float(x), 4) for x in fila] for fila in conf],
     })
@@ -292,25 +293,25 @@ def pruebas(P, nombres, rng):
     lo, hi = 0.5 / J, 1.5 / J
     ok = bool(((cuota >= lo) & (cuota <= hi)).all())
     res.append({
-        "prueba": "Votante al azar",
+        "prueba": "Respuestas aleatorias",
         "que": "100.000 usuarios que responden al azar.",
-        "criterio": f"Cada partido gana entre el {pc(lo)} y el {pc(hi)} de las veces (lo justo sería el {pc(1/J)}).",
-        "resultado": "Reparto: " + ", ".join(f"{nombres[j]} {pc(cuota[j], 1)}" for j in range(J)) + ".",
+        "criterio": f"Cada partido obtiene el primer puesto entre el {pc(lo)} y el {pc(hi)} de las veces (el reparto equitativo sería el {pc(1/J)}).",
+        "resultado": "Frecuencia del primer puesto: " + ", ".join(f"{nombres[j]} {pc(cuota[j], 1)}" for j in range(J)) + ".",
         "ok": ok,
     })
 
     # Todo sí / todo no / todo neutral
     partes, ok = [], True
-    for etiqueta, v in (("todo «muy a favor»", 2), ("todo «muy en contra»", -2), ("todo «neutral»", 0)):
+    for etiqueta, v in (("siempre «muy a favor»", 2), ("siempre «muy en contra»", -2), ("siempre «neutral»", 0)):
         S = puntuar(np.full((1, Q), float(v)), np.ones((1, Q)), P)[0]
         orden = np.argsort(-S)
         dif = S[orden[0]] - S[orden[1]]
         ok &= bool(dif < 5)
-        partes.append(f"{etiqueta}: {nombres[orden[0]]} saca " + f"{dif:.1f}".replace(".", ",") + " puntos al segundo")
+        partes.append(f"{etiqueta}: diferencia de " + f"{dif:.1f}".replace(".", ",") + " puntos")
     res.append({
-        "prueba": "Todo sí / todo no",
-        "que": "Usuarios que marcan la misma respuesta en todas las preguntas.",
-        "criterio": "El primero y el segundo están a menos de 5 puntos.",
+        "prueba": "Respuesta uniforme",
+        "que": "Usuarios que eligen la misma respuesta en todas las propuestas.",
+        "criterio": "La diferencia entre el primer y el segundo partido es inferior a 5 puntos.",
         "resultado": "; ".join(partes) + ".",
         "ok": ok,
     })
@@ -325,10 +326,10 @@ def pruebas(P, nombres, rng):
             criticas.append(q)
     ok = not criticas
     res.append({
-        "prueba": "Pregunta decisiva",
-        "que": "Se quita cada pregunta, de una en una, y se repite el votante perfecto.",
-        "criterio": "Ninguna pregunta suelta cambia el resultado.",
-        "resultado": "Ninguna pregunta es decisiva por sí sola." if ok else f"{len(criticas)} preguntas cambian el resultado.",
+        "prueba": "Influencia de una sola propuesta",
+        "que": "Se elimina cada propuesta, de una en una, y se repite la prueba de coincidencia perfecta.",
+        "criterio": "Ninguna propuesta altera por sí sola el resultado.",
+        "resultado": "Ninguna propuesta altera por sí sola el resultado." if ok else f"{len(criticas)} propuestas alteran el resultado.",
         "ok": ok,
         "criticas": criticas,
     })
@@ -346,10 +347,10 @@ def pruebas(P, nombres, rng):
     acuerdo = iguales / total
     ok = acuerdo >= 0.95
     res.append({
-        "prueba": "Otra fórmula",
-        "que": "Se recalcula con distancia euclídea en lugar de Manhattan, sobre 10.000 votantes realistas.",
-        "criterio": "Mismo ganador en al menos el 95 % de los casos.",
-        "resultado": f"Mismo ganador en el {pc(acuerdo, 1)} de los casos.",
+        "prueba": "Robustez del método",
+        "que": "Se repite el cálculo con distancia euclídea en lugar de distancia de Manhattan, sobre 10.000 votantes realistas.",
+        "criterio": "El partido con mayor coincidencia es el mismo en al menos el 95 % de los casos.",
+        "resultado": f"Coincide en el {pc(acuerdo, 1)} de los casos.",
         "ok": bool(ok),
     })
     return res
