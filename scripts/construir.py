@@ -3,8 +3,10 @@
 Qué hace, en orden:
   1. Lee el Excel y comprueba que está bien rellenado (si hay errores, para).
   2. Ejecuta las pruebas de neutralidad con usuarios simulados (Monte Carlo).
-  3. Escribe data.js (lo que lee la web) y validacion.md (informe de las pruebas).
-  4. Si Node.js está instalado, comprueba que la web calcula igual que este script.
+  3. Si Node.js está instalado, comprueba que la web calcula igual que este script.
+  4. Escribe validacion.md (informe) y, SOLO si todo está bien, actualiza data.js
+     (lo que lee la web). Si algo falla, data.js no se toca y la web sigue con
+     los últimos datos válidos.
 
 Uso (desde la carpeta del proyecto):
     python scripts/construir.py
@@ -26,6 +28,7 @@ EXCEL = RAIZ / "datos" / "datos.xlsx"
 SALIDA_JS = RAIZ / "data.js"
 INFORME = RAIZ / "validacion.md"
 CASOS = RAIZ / "scripts" / "casos_prueba.json"
+CANDIDATO = RAIZ / "scripts" / "data_candidato.js"
 
 SEMILLA = 29
 K_ENCOGIMIENTO = 3          # preguntas "imaginarias" al 50 % (corrección por casillas vacías)
@@ -45,6 +48,16 @@ def texto(v) -> str:
     return str(v).strip()
 
 
+def entero(v):
+    t = texto(v)
+    if not t:
+        return None
+    try:
+        return int(float(t))
+    except ValueError:
+        return None
+
+
 def leer_excel():
     if not EXCEL.exists():
         sys.exit(f"No encuentro {EXCEL}")
@@ -56,11 +69,12 @@ def leer_excel():
     cfg = {texto(r["clave"]): r["valor"] for _, r in hojas["config"].iterrows() if texto(r["clave"])}
     config = {
         "titulo": texto(cfg.get("titulo")) or "Brújula 29N",
-        "subtitulo": texto(cfg.get("subtitulo")),
         "eleccion": texto(cfg.get("eleccion")),
         "autoria": texto(cfg.get("autoria")),
-        "demo": texto(cfg.get("demo")).lower() in ("sí", "si", "yes", "true", "1"),
-        "min_respuestas": int(float(texto(cfg.get("min_respuestas")) or 20)),
+        "quienes_somos": texto(cfg.get("quienes_somos")),
+        "contacto": texto(cfg.get("contacto")),
+        "repositorio": texto(cfg.get("repositorio")),
+        "min_respuestas": entero(cfg.get("min_respuestas")) or 20,
         "nota_partidos": texto(cfg.get("nota_partidos")),
     }
 
@@ -74,20 +88,32 @@ def leer_excel():
             errores.append(f"partidos, fila {fila}: el id '{pid}' no puede estar vacío ni tener espacios.")
         if not nombre:
             errores.append(f"partidos, fila {fila}: falta el nombre.")
-        partidos.append({"id": pid, "nombre": nombre, "nota": texto(r.get("nota"))})
+        if not texto(r.get("programa")) or not texto(r.get("url")):
+            errores.append(f"partidos, fila {fila}: falta el título del programa o su enlace (url).")
+        partidos.append({"id": pid, "nombre": nombre, "programa": texto(r.get("programa")),
+                         "url": texto(r.get("url")), "nota": texto(r.get("nota"))})
     ids = [p["id"] for p in partidos]
     if len(set(ids)) != len(ids):
         errores.append("partidos: hay ids repetidos.")
     if len(partidos) < 2:
         errores.append("partidos: hacen falta al menos 2 partidos.")
 
+    referencias = []
+    if "referencias" in hojas:
+        for _, r in hojas["referencias"].iterrows():
+            if texto(r.get("titulo")):
+                referencias.append({k: texto(r.get(k)) for k in ("autores", "anio", "titulo", "publicacion", "url", "uso")})
+
     df = hojas["propuestas"]
+    for col in ("id", "tema", "texto", "autor", "apartado", "pagina"):
+        if col not in df.columns:
+            errores.append(f"propuestas: falta la columna '{col}'.")
     for pid in ids:
-        for col in (f"{pid} postura", f"{pid} cita"):
+        for col in (f"{pid} postura", f"{pid} cita", f"{pid} pagina"):
             if col not in df.columns:
                 errores.append(f"propuestas: falta la columna '{col}'.")
     if errores:
-        return config, partidos, []
+        return config, partidos, [], referencias
 
     propuestas, vistos = [], set()
     for i, r in df.iterrows():
@@ -106,10 +132,14 @@ def leer_excel():
         autor = texto(r.get("autor"))
         if autor not in ids:
             errores.append(f"{donde}: el autor '{autor}' no está en la hoja partidos.")
+        pagina = entero(r.get("pagina"))
+        if pagina is None:
+            errores.append(f"{donde}: falta la página del programa donde aparece la propuesta.")
 
         posturas = {}
         for pid in ids:
             bruto, cita = r.get(f"{pid} postura"), texto(r.get(f"{pid} cita"))
+            pag = entero(r.get(f"{pid} pagina"))
             if texto(bruto) == "":
                 v = None
             else:
@@ -120,9 +150,12 @@ def leer_excel():
                 except (TypeError, ValueError):
                     errores.append(f"{donde}: la postura de {pid} es '{bruto}'; solo vale -2, -1, 0, 1, 2 o vacío.")
                     v = None
-            if v is not None and not cita:
-                errores.append(f"{donde}: {pid} tiene postura {v} pero no tiene cita que la justifique.")
-            posturas[pid] = {"v": v, "cita": cita}
+            if pid == autor:
+                # la cita del autor es la propia propuesta
+                cita, pag = cita or txt, pag or pagina
+            if v is not None and (not cita or pag is None):
+                errores.append(f"{donde}: {pid} tiene postura {v} pero le falta la cita o la página que la justifica.")
+            posturas[pid] = {"v": v, "cita": cita, "pagina": pag}
 
         if autor in posturas and posturas[autor]["v"] != 2:
             errores.append(f"{donde}: el autor ({autor}) debe tener postura 2.")
@@ -136,7 +169,8 @@ def leer_excel():
 
         propuestas.append({
             "id": qid, "tema": texto(r.get("tema")) or "Otros", "texto": txt,
-            "autor": autor, "fuente": texto(r.get("fuente")), "posturas": posturas,
+            "aclaracion": texto(r.get("aclaracion")), "autor": autor,
+            "apartado": texto(r.get("apartado")), "pagina": pagina, "posturas": posturas,
         })
 
     if len(propuestas) < config["min_respuestas"]:
@@ -149,7 +183,7 @@ def leer_excel():
     for tema, n in pd.Series([p["tema"] for p in propuestas]).value_counts().items():
         if n > 4:
             avisos.append(f"El tema '{tema}' tiene {n} propuestas (recomendado entre 2 y 4).")
-    return config, partidos, propuestas
+    return config, partidos, propuestas, referencias
 
 
 # ---------------------------------------------------------------------------
@@ -338,7 +372,7 @@ def casos_prueba(P, Q, rng, n=60):
 
 
 def main():
-    config, partidos, propuestas = leer_excel()
+    config, partidos, propuestas, referencias = leer_excel()
     if errores:
         print("\nHay errores en el Excel. Corrígelos y vuelve a ejecutar:\n")
         for e in errores:
@@ -352,34 +386,21 @@ def main():
     rng = np.random.default_rng(SEMILLA)
 
     print(f"Excel correcto: {len(partidos)} partidos, {len(propuestas)} propuestas.")
-    print("Ejecutando pruebas de neutralidad…")
+    print("Ejecutando las pruebas de neutralidad…")
     res = pruebas(P, nombres, rng)
+    fecha = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     datos = {
         "config": config,
         "partidos": partidos,
         "propuestas": propuestas,
-        "validacion": {
-            "fecha": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-            "semilla": SEMILLA,
-            "pruebas": res,
-        },
+        "referencias": referencias,
+        "validacion": {"fecha": fecha, "semilla": SEMILLA, "pruebas": res},
         "parametros": {"k": K_ENCOGIMIENTO, "bootstrap": 1000, "umbral_empate": 0.70},
     }
-    SALIDA_JS.write_text(
-        "// Generado por scripts/construir.py — no editar a mano. Edita datos/datos.xlsx.\n"
-        "window.BRUJULA_DATA = " + json.dumps(datos, ensure_ascii=False, indent=1) + ";\n",
-        encoding="utf-8")
-
-    lineas = [f"# Informe de validación — {config['titulo']}", "",
-              f"Generado: {datos['validacion']['fecha']} · semilla {SEMILLA}", "",
-              "| Prueba | Criterio | Resultado | ¿Aprobada? |", "| --- | --- | --- | --- |"]
-    for r in res:
-        lineas.append(f"| {r['prueba']} | {r['criterio']} | {r['resultado']} | {'Sí' if r['ok'] else 'NO'} |")
-    if avisos:
-        lineas += ["", "## Avisos sobre los datos", ""] + [f"- {a}" for a in avisos]
-    INFORME.write_text("\n".join(lineas) + "\n", encoding="utf-8")
-
+    contenido = ("// Generado por scripts/construir.py — no editar a mano. Edita datos/datos.xlsx.\n"
+                 "window.BRUJULA_DATA = " + json.dumps(datos, ensure_ascii=False, indent=1) + ";\n")
+    CANDIDATO.write_text(contenido, encoding="utf-8")
     CASOS.write_text(json.dumps({"partidos": ids, "casos": casos_prueba(P, len(propuestas), rng)}), encoding="utf-8")
 
     print()
@@ -390,20 +411,39 @@ def main():
         for a in avisos:
             print("  !", a)
 
+    motor_ok = True
     if shutil.which("node"):
-        out = subprocess.run(["node", str(RAIZ / "scripts" / "comprobar_motor.js")],
+        out = subprocess.run(["node", str(RAIZ / "scripts" / "comprobar_motor.js"), str(CANDIDATO)],
                              capture_output=True, text=True)
         print("\n" + (out.stdout or out.stderr).strip())
-        if out.returncode != 0:
-            sys.exit(1)
+        motor_ok = out.returncode == 0
     else:
         print("\n(Node.js no está instalado: me salto la comprobación web = script.)")
 
     fallidas = [r["prueba"] for r in res if not r["ok"]]
-    print(f"\nListo: data.js y validacion.md actualizados.")
-    if fallidas:
-        print("ATENCIÓN: no han pasado estas pruebas: " + ", ".join(fallidas) +
-              ". Revisa la selección de propuestas antes de publicar.")
+    publicable = not fallidas and motor_ok
+
+    lineas = [f"# Informe de validación — {config['titulo']}", "",
+              f"Generado: {fecha} · semilla {SEMILLA}", "",
+              f"**Estado: {'PUBLICABLE' if publicable else 'NO PUBLICABLE'}**", "",
+              "| Prueba | Criterio | Resultado | ¿Aprobada? |", "| --- | --- | --- | --- |"]
+    for r in res:
+        lineas.append(f"| {r['prueba']} | {r['criterio']} | {r['resultado']} | {'Sí' if r['ok'] else 'NO'} |")
+    if avisos:
+        lineas += ["", "## Avisos sobre los datos", ""] + [f"- {a}" for a in avisos]
+    INFORME.write_text("\n".join(lineas) + "\n", encoding="utf-8")
+
+    if publicable:
+        shutil.copyfile(CANDIDATO, SALIDA_JS)
+        CANDIDATO.unlink()
+        print("\nPUBLICABLE: todas las pruebas superadas. data.js y validacion.md actualizados.")
+        print("Sube a GitHub: datos/datos.xlsx, data.js y validacion.md.")
+    else:
+        motivo = ("no han pasado estas pruebas: " + ", ".join(fallidas)) if fallidas else "la web y el script no calculan igual"
+        print(f"\nNO PUBLICABLE: {motivo}.")
+        print("data.js NO se ha modificado: la web sigue mostrando los últimos datos válidos.")
+        print("Cambia la selección de propuestas (no la fórmula) y vuelve a ejecutar. Detalle en validacion.md.")
+        sys.exit(2)
 
 
 if __name__ == "__main__":

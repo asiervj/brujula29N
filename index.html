@@ -3,27 +3,55 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Brújula 29N</title>
-  <meta name="description" content="Test de orientación de voto con propuestas literales de los programas, sin saber de qué partido son. No guarda tus respuestas.">
+  <title>Brújula 29N — ¿Qué programa se parece más a lo que piensas?</title>
+  <meta name="description" content="Test de orientación de voto con propuestas literales de los programas electorales, sin saber de qué partido son. Con las fuentes citadas y sin guardar tus respuestas.">
+  <meta property="og:title" content="Brújula 29N">
+  <meta property="og:description" content="Propuestas literales de los programas, a ciegas. Descubre con quién coincides y por qué.">
+  <meta name="theme-color" content="#f6f7f9">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2318212f'/%3E%3Cpath d='M16 5l4 11h-8z' fill='%23d79a2b'/%3E%3Cpath d='M16 27l-4-11h8z' fill='%23fff'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="saltar" href="#app">Ir al contenido</a>
-  <header class="cabecera">
-    <a class="marca" href="#/">Brújula 29N</a>
-    <a class="enlace-sec" href="#/metodologia">Cómo funciona</a>
+  <header class="barra">
+    <nav class="barra-in" aria-label="Principal">
+      <a class="logo" href="#/">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="var(--tinta)"/><path d="M16 5l4 11h-8z" fill="var(--oro)"/><path d="M16 27l-4-11h8z" fill="#fff"/></svg>
+        Brújula 29N
+      </a>
+      <div class="menu">
+        <a href="#/como-funciona" data-nav="como-funciona">Cómo funciona</a>
+        <a href="#/metodologia" data-nav="metodologia">Metodología</a>
+        <a href="#/fuentes" data-nav="fuentes">Fuentes</a>
+      </div>
+      <a class="boton boton-peq" href="#/test" id="nav-test">Hacer el test</a>
+    </nav>
   </header>
-  <div id="aviso-demo" class="aviso-demo" hidden>
-    Versión de demostración: los partidos y las propuestas son inventados.
-  </div>
+
   <main id="app" tabindex="-1"></main>
+
   <footer class="pie">
-    <p>No guardamos tus respuestas: todo se calcula en tu navegador y desaparece al cerrar la página. Sin cookies ni estadísticas.</p>
+    <div class="pie-in">
+      <div>
+        <p class="pie-marca">Brújula 29N</p>
+        <p>Un test para conocer de primera mano lo que proponen los partidos. No recomienda el voto.</p>
+      </div>
+      <div>
+        <p class="pie-tit">Saber más</p>
+        <a href="#/como-funciona">Cómo funciona</a>
+        <a href="#/metodologia">Metodología y controles de calidad</a>
+        <a href="#/fuentes">Fuentes y datos descargables</a>
+      </div>
+      <div>
+        <p class="pie-tit">Privacidad</p>
+        <p>No guardamos tus respuestas. Todo se calcula en tu navegador y desaparece al cerrar la página. Sin cookies ni estadísticas de visitas.</p>
+      </div>
+    </div>
   </footer>
-  <noscript><p class="contenedor">Esta web necesita JavaScript para calcular el resultado en tu propio navegador.</p></noscript>
+  <noscript><p class="aviso-js">Esta web necesita JavaScript para calcular el resultado en tu propio navegador.</p></noscript>
   <script src="data.js"></script>
   <script src="motor.js"></script>
   <script src="app.js"></script>

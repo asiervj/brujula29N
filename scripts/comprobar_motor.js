@@ -6,7 +6,7 @@ const vm = require("vm");
 
 const raiz = path.resolve(__dirname, "..");
 const ctx = { window: {} };
-vm.runInNewContext(fs.readFileSync(path.join(raiz, "data.js"), "utf8"), ctx);
+vm.runInNewContext(fs.readFileSync(process.argv[2] || path.join(raiz, "data.js"), "utf8"), ctx);
 const datos = ctx.window.BRUJULA_DATA;
 const Motor = require(path.join(raiz, "motor.js"));
 const { partidos, casos } = JSON.parse(fs.readFileSync(path.join(__dirname, "casos_prueba.json"), "utf8"));
