@@ -151,7 +151,7 @@
       '<ol class="pasos">' +
       '<li class="paso"><h3>Lees una propuesta</h3><p>Cada una es una frase literal de un programa electoral. No verás el partido, el logo ni el color hasta el final. Hay ' + POR_PARTIDO + " de cada partido.</p></li>" +
       '<li class="paso"><h3>Das tu opinión</h3><p>Eliges entre «muy en contra» y «muy a favor». Si un tema pesa mucho en tu voto, márcalo como importante y contará el doble.</p></li>' +
-      '<li class="paso"><h3>Ves con quién coincides</h3><p>Obtienes tu porcentaje con cada partido y, propuesta a propuesta, quién la hizo y qué opina cada partido, con la cita y la página de su programa.</p></li>' +
+      '<li class="paso"><h3>Ves con quién coincides</h3><p>Obtienes tu porcentaje de afinidad con cada partido y, propuesta a propuesta, a quién pertenece y qué opina cada partido, con la cita y la página de su programa.</p></li>' +
       "</ol>" +
       '<div class="simulador" id="simulador"></div>' +
       "</div></section>" +
