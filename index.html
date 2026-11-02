@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brújula 29N</title>
+  <meta name="description" content="Test de orientación de voto con propuestas literales de los programas, sin saber de qué partido son. No guarda tus respuestas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="saltar" href="#app">Ir al contenido</a>
+  <header class="cabecera">
+    <a class="marca" href="#/">Brújula 29N</a>
+    <a class="enlace-sec" href="#/metodologia">Cómo funciona</a>
+  </header>
+  <div id="aviso-demo" class="aviso-demo" hidden>
+    Versión de demostración: los partidos y las propuestas son inventados.
+  </div>
+  <main id="app" tabindex="-1"></main>
+  <footer class="pie">
+    <p>No guardamos tus respuestas: todo se calcula en tu navegador y desaparece al cerrar la página. Sin cookies ni estadísticas.</p>
+  </footer>
+  <noscript><p class="contenedor">Esta web necesita JavaScript para calcular el resultado en tu propio navegador.</p></noscript>
+  <script src="data.js"></script>
+  <script src="motor.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
