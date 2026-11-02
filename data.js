@@ -4,8 +4,8 @@ window.BRUJULA_DATA = {
   "titulo": "Brújula 29N",
   "eleccion": "Elecciones generales del 29 de noviembre de 2026",
   "autoria": "Asier Vázquez Jiménez",
-  "quienes_somos": "Brújula 29N es un proyecto personal e independiente de Asier Vázquez Jiménez, graduado en Business & Data Analytics por la Universidad Autónoma de Madrid. No recibe financiación de ningún partido, empresa u organización y no tiene publicidad.",
-  "contacto": "",
+  "quienes_somos": "Brújula 29N es un proyecto personal e independiente de Asier Vázquez Jiménez. No recibe financiación de ningún partido, empresa u organización y no tiene publicidad.",
+  "contacto": "asiervazquezjimenez@gmail.com",
   "repositorio": "",
   "min_respuestas": 18,
   "nota_partidos": "Se incluyen las candidaturas que se presentaron en toda España y superaron el 3 % de los votos en las elecciones generales de 2023: PP, PSOE, Vox y Sumar. Las propuestas proceden de los programas que presentaron a esas elecciones."
